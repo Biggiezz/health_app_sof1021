@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         btnCardMeals.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MealActivity.class)));
         btnCardExercise.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ExerciseActivity.class)));
         btnCardProfile.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProfileActivity.class)));
+        btnCardNotification.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, NotificationActivity.class)));
     }
 
     private void initUi() {

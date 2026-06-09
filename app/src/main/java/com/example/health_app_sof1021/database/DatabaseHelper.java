@@ -28,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_SO_LUONG = "soLuong";
     public static final String COL_NGAY_AN = "ngayAn";
 
-    // Exercise Table
+    /// Exercise Table
     public static final String TABLE_EXERCISE = "Exercise";
     public static final String COL_EX_ID = "exId";
     public static final String COL_EX_USER_ID = "userId";
@@ -36,6 +36,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_EX_DURATION = "thoiGian";
     public static final String COL_EX_CALORIES = "caloTieuThu";
     public static final String COL_EX_DATE = "ngayTap";
+
+    /// Notification Table
+    public static final String TABLE_NOTIFICATION = "Notification";
+    public static final String COL_NOTIF_ID = "maThongBao";
+    public static final String COL_NOTIF_USER_ID = "userId";
+    public static final String COL_NOTIF_TITLE = "tieuDe";
+    public static final String COL_NOTIF_CONTENT = "noiDung";
+    public static final String COL_NOTIF_DATE = "ngayThongBao";
+    public static final String COL_NOTIF_IS_READ = "daDoc";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -61,6 +71,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 4) {
             createExerciseTable(db);
         }
+        if (oldVersion < 5) {
+            createNotificationTable(db);
+        }
     }
 
     private void createMealPlanTable(SQLiteDatabase db) {
@@ -85,6 +98,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_EX_DATE + " TEXT NOT NULL)";
         db.execSQL(createExerciseTable);
     }
+
+    private void createNotificationTable(SQLiteDatabase db) {
+        String createNotifTable = "CREATE TABLE IF NOT EXISTS " + TABLE_NOTIFICATION + " ("
+                + COL_NOTIF_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_NOTIF_USER_ID + " INTEGER DEFAULT 1, "
+                + COL_NOTIF_TITLE + " TEXT NOT NULL, "
+                + COL_NOTIF_CONTENT + " TEXT NOT NULL, "
+                + COL_NOTIF_DATE + " TEXT NOT NULL, "
+                + COL_NOTIF_IS_READ + " INTEGER DEFAULT 0)";
+        db.execSQL(createNotifTable);
+    }
+
     public boolean insertUser(String hoTen, String email, String matKhau) {
         if (isEmailExists(email)) {
             return false;
@@ -151,5 +176,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
         return result > 0;
     }
-
 }
