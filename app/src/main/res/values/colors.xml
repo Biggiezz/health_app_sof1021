@@ -7,4 +7,20 @@
     <color name="surface">#F7FAF8</color>
     <color name="text_primary">#1B1F1D</color>
     <color name="text_secondary">#66736C</color>
+
+    <color name="colorPrimary">#10B981</color>
+    <color name="colorPrimaryDark">#059669</color>
+    <color name="colorAccent">#3B82F6</color>
+    <color name="bg_gray">#F3F4F6</color>
+    <color name="text_dark">#1F2937</color>
+    <color name="text_gray">#6B7280</color>
+    <color name="blue_water">#0EA5E9</color>
+    <color name="amber_workout">#F59E0B</color>
+    <color name="purple_stats">#8B5CF6</color>
+    <color name="red_alert">#EF4444</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="light_green">#E8F5E9</color>
+    <color name="light_blue">#E0F2FE</color>
+    <color name="light_amber">#FEF3C7</color>
+    <color name="light_purple">#F3E8FF</color>
 </resources>
