@@ -23,4 +23,6 @@
     <color name="light_blue">#E0F2FE</color>
     <color name="light_amber">#FEF3C7</color>
     <color name="light_purple">#F3E8FF</color>
+    <color name="subtext_splash">#434655</color>
+    <color name="text_logout">#BA1A1A</color>
 </resources>
