@@ -29,7 +29,7 @@
 
             <!-- BMI -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardBMI"
+                android:id="@+id/btnCardBMI"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
@@ -60,7 +60,7 @@
 
             <!-- Water -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardWater"
+                android:id="@+id/btnCardWater"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
@@ -91,7 +91,7 @@
 
             <!-- Meals -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardMeals"
+                android:id="@+id/btnCardMeals"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
@@ -122,7 +122,7 @@
 
             <!-- Exercise -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardExercise"
+                android:id="@+id/btnCardExercise"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
@@ -153,7 +153,7 @@
 
             <!-- Statistics -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardStats"
+                android:id="@+id/btnCardStats"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
@@ -184,7 +184,7 @@
 
             <!-- Logout -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnLogout"
+                android:id="@+id/btnCardNotification"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
@@ -213,7 +213,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnLogout"
+                android:id="@+id/btnCardProfile"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
@@ -231,7 +231,7 @@
                     <ImageView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@android:drawable/ic_lock_power_off" />
+                        android:src="@drawable/ic_setting" />
 
                     <TextView
                         android:layout_width="wrap_content"

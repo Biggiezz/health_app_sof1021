@@ -1,5 +1,6 @@
 package com.example.health_app_sof1021;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -8,7 +9,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.card.MaterialCardView;
+
 public class MainActivity extends AppCompatActivity {
+    private MaterialCardView btnCardMeals, btnCardExercise, btnCardNotification, btnCardProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,5 +24,21 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        initUi();
+        initEvent();
+    }
+
+    private void initEvent() {
+        btnCardMeals.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, MealActivity.class));
+        });
+
+    }
+
+    private void initUi() {
+        btnCardMeals = findViewById(R.id.btnCardMeals);
+        btnCardExercise = findViewById(R.id.btnCardExercise);
+        btnCardNotification = findViewById(R.id.btnCardNotification);
+        btnCardProfile = findViewById(R.id.btnCardProfile);
     }
 }

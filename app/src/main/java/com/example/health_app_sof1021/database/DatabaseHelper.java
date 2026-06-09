@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "HealthApp.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     public static final String TABLE_USER = "User";
     public static final String COL_USER_ID = "userId";
@@ -16,6 +16,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_EMAIL = "email";
     public static final String COL_MAT_KHAU = "matKhau";
     public static final String COL_NGAY_TAO = "ngayTao";
+
+    /// Tai khoan da dang ky de test: manhphuc3005@gmail.com | 123456
+
+    public static final String TABLE_MEAL_PLAN = "MealPlan";
+    public static final String COL_MEAL_ID = "mealId";
+    public static final String COL_MEAL_USER_ID = "userId";
+    public static final String COL_TEN_MON = "tenMon";
+    public static final String COL_LOAI_BUA = "loaiBua";
+    public static final String COL_CALO = "calo";
+    public static final String COL_SO_LUONG = "soLuong";
+    public static final String COL_NGAY_AN = "ngayAn";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,12 +41,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_MAT_KHAU + " TEXT NOT NULL, "
                 + COL_NGAY_TAO + " TEXT DEFAULT CURRENT_TIMESTAMP)";
         db.execSQL(createUserTable);
+        createMealPlanTable(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        onCreate(db);
+        if (oldVersion < 2) {
+            createMealPlanTable(db);
+        }
+    }
+
+    private void createMealPlanTable(SQLiteDatabase db) {
+        String createMealPlanTable = "CREATE TABLE IF NOT EXISTS " + TABLE_MEAL_PLAN + " ("
+                + COL_MEAL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_MEAL_USER_ID + " INTEGER DEFAULT 1, "
+                + COL_TEN_MON + " TEXT NOT NULL, "
+                + COL_LOAI_BUA + " TEXT NOT NULL, "
+                + COL_CALO + " INTEGER NOT NULL, "
+                + COL_SO_LUONG + " INTEGER NOT NULL, "
+                + COL_NGAY_AN + " TEXT NOT NULL)";
+        db.execSQL(createMealPlanTable);
     }
 
     public boolean insertUser(String hoTen, String email, String matKhau) {
@@ -86,4 +111,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return isValid;
     }
+
+    public boolean updatePasswordByEmail(String email, String matKhauMoi) {
+        if (!isEmailExists(email)) {
+            return false;
+        }
+
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_MAT_KHAU, matKhauMoi);
+
+        int result = db.update(
+                TABLE_USER,
+                values,
+                COL_EMAIL + " = ?",
+                new String[]{email}
+        );
+        return result > 0;
+    }
+
 }
