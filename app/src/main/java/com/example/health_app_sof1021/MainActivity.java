@@ -2,6 +2,7 @@ package com.example.health_app_sof1021;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +13,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.card.MaterialCardView;
 
 public class MainActivity extends AppCompatActivity {
-    private MaterialCardView btnCardMeals, btnCardExercise, btnCardNotification, btnCardProfile;
+    private MaterialCardView btnCardMeals, btnCardExercise, btnCardProfile;
+    private FrameLayout btnCardNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +31,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initEvent() {
-        btnCardMeals.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, MealActivity.class));
-        });
-
+        btnCardMeals.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MealActivity.class)));
+        btnCardExercise.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ExerciseActivity.class)));
+        btnCardProfile.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProfileActivity.class)));
     }
 
     private void initUi() {

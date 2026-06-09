@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "HealthApp.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5; // Incremented version to 5
 
     public static final String TABLE_USER = "User";
     public static final String COL_USER_ID = "userId";
@@ -28,6 +28,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_SO_LUONG = "soLuong";
     public static final String COL_NGAY_AN = "ngayAn";
 
+    // Exercise Table
+    public static final String TABLE_EXERCISE = "Exercise";
+    public static final String COL_EX_ID = "exId";
+    public static final String COL_EX_USER_ID = "userId";
+    public static final String COL_EX_NAME = "tenBaiTap";
+    public static final String COL_EX_DURATION = "thoiGian";
+    public static final String COL_EX_CALORIES = "caloTieuThu";
+    public static final String COL_EX_DATE = "ngayTap";
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -42,12 +50,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_NGAY_TAO + " TEXT DEFAULT CURRENT_TIMESTAMP)";
         db.execSQL(createUserTable);
         createMealPlanTable(db);
+        createExerciseTable(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 2) {
             createMealPlanTable(db);
+        }
+        if (oldVersion < 4) {
+            createExerciseTable(db);
         }
     }
 
@@ -63,6 +75,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(createMealPlanTable);
     }
 
+    private void createExerciseTable(SQLiteDatabase db) {
+        String createExerciseTable = "CREATE TABLE IF NOT EXISTS " + TABLE_EXERCISE + " ("
+                + COL_EX_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_EX_USER_ID + " INTEGER DEFAULT 1, "
+                + COL_EX_NAME + " TEXT NOT NULL, "
+                + COL_EX_DURATION + " INTEGER NOT NULL, "
+                + COL_EX_CALORIES + " INTEGER NOT NULL, "
+                + COL_EX_DATE + " TEXT NOT NULL)";
+        db.execSQL(createExerciseTable);
+    }
     public boolean insertUser(String hoTen, String email, String matKhau) {
         if (isEmailExists(email)) {
             return false;
