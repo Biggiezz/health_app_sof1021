@@ -30,6 +30,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_MAT_KHAU + " TEXT NOT NULL, "
                 + COL_NGAY_TAO + " TEXT DEFAULT CURRENT_TIMESTAMP)";
         db.execSQL(createUserTable);
+
+        String createTableBMIRecord = "CREATE TABLE BMIRecord (" +
+                "BmiID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "userId INTEGER, " +
+                "chieuCao REAL, " +
+                "canNang REAL, " +
+                "chiSoBMI REAL, " +
+                "ngayDo TEXT, " +
+                "FOREIGN KEY(userId) REFERENCES User(UserID))";
+        db.execSQL(createTableBMIRecord);
     }
 
     @Override
