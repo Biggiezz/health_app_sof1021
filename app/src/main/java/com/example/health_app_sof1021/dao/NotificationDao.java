@@ -50,6 +50,44 @@ public class NotificationDao {
         return list;
     }
 
+    /**
+     * Lấy danh sách thông báo theo ID người dùng
+     * @param userId ID của người dùng đang đăng nhập
+     * @return Danh sách thông báo của người dùng đó
+     */
+    public List<Notification> getAllByUserId(int userId) {
+        List<Notification> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        
+        String selection = DatabaseHelper.COL_NOTIF_USER_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(userId)};
+        
+        Cursor cursor = db.query(
+                DatabaseHelper.TABLE_NOTIFICATION,
+                null,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                DatabaseHelper.COL_NOTIF_ID + " DESC"
+        );
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                Notification notif = new Notification();
+                notif.setMaThongBao(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NOTIF_ID)));
+                notif.setMaNguoiDung(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NOTIF_USER_ID)));
+                notif.setTieuDe(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NOTIF_TITLE)));
+                notif.setNoiDung(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NOTIF_CONTENT)));
+                notif.setNgayThongBao(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NOTIF_DATE)));
+                notif.setDaDoc(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NOTIF_IS_READ)));
+                list.add(notif);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return list;
+    }
+
     public boolean updateStatus(int id, int status) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();

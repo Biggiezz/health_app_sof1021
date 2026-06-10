@@ -1,4 +1,4 @@
-package com.example.health_app_sof1021;
+package com.example.health_app_sof1021.activity;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -17,8 +17,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.health_app_sof1021.R;
 import com.example.health_app_sof1021.dao.MealDao;
 import com.example.health_app_sof1021.model.Meal;
+import com.example.health_app_sof1021.utils.DateUtils;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.SimpleDateFormat;
@@ -64,7 +66,10 @@ public class MealActivity extends AppCompatActivity {
         tvCaloMon = findViewById(R.id.tvCaloMon);
         tvTongCalo = findViewById(R.id.tvTongCalo);
         lvMealPlan = findViewById(R.id.lvMealPlan);
-        edtNgayAn.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        
+        // Sử dụng định dạng dd-MM-yyyy đồng bộ với OpenDatePicker
+        edtNgayAn.setText(new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date()));
+        
         mealPlans = new ArrayList<>();
         mealPlanAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mealPlans);
         lvMealPlan.setAdapter(mealPlanAdapter);
@@ -85,6 +90,10 @@ public class MealActivity extends AppCompatActivity {
 
     private void initEvent() {
         toolbarMeal.setNavigationOnClickListener(v -> finish());
+        
+        // Áp dụng OpenDatePicker cho edtNgayAn
+        edtNgayAn.setOnClickListener(v -> DateUtils.openDatePicker(this, edtNgayAn));
+
         spnMonAn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

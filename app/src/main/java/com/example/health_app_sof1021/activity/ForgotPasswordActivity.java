@@ -1,4 +1,4 @@
-package com.example.health_app_sof1021;
+package com.example.health_app_sof1021.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +11,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.health_app_sof1021.database.DatabaseHelper;
+import com.example.health_app_sof1021.R;
+import com.example.health_app_sof1021.dao.UserDAO;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -19,7 +20,8 @@ import com.google.android.material.textfield.TextInputLayout;
 public class ForgotPasswordActivity extends AppCompatActivity {
     private TextInputLayout tilEmail;
     private TextInputEditText edtEmail;
-    private DatabaseHelper databaseHelper;
+    private MaterialButton btnSendResetLink, btnBackLogin;
+    private UserDAO userDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,15 +33,21 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        initUi();
+        userDAO = new UserDAO(this);
+        initListener();
+    }
 
-        databaseHelper = new DatabaseHelper(this);
-        tilEmail = findViewById(R.id.tilEmail);
-        edtEmail = findViewById(R.id.edtEmail);
-        MaterialButton btnSendResetLink = findViewById(R.id.btnSendResetLink);
-        MaterialButton btnBackLogin = findViewById(R.id.btnBackLogin);
-
+    private void initListener() {
         btnSendResetLink.setOnClickListener(v -> checkEmailAndOpenReset());
         btnBackLogin.setOnClickListener(v -> finish());
+    }
+
+    private void initUi() {
+        tilEmail = findViewById(R.id.tilEmail);
+        edtEmail = findViewById(R.id.edtEmail);
+        btnSendResetLink = findViewById(R.id.btnSendResetLink);
+        btnBackLogin = findViewById(R.id.btnBackLogin);
     }
 
     private void checkEmailAndOpenReset() {
@@ -56,7 +64,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             return;
         }
 
-        if (!databaseHelper.isEmailExists(email)) {
+        if (!userDAO.isEmailExists(email)) {
             tilEmail.setError("Email chưa được đăng ký");
             return;
         }

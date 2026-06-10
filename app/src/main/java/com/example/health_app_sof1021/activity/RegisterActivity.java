@@ -1,4 +1,4 @@
-package com.example.health_app_sof1021;
+package com.example.health_app_sof1021.activity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,7 +11,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.health_app_sof1021.database.DatabaseHelper;
+import com.example.health_app_sof1021.R;
+import com.example.health_app_sof1021.dao.UserDAO;
+import com.example.health_app_sof1021.model.User;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -25,7 +27,8 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputEditText edtEmail;
     private TextInputEditText edtPassword;
     private TextInputEditText edtConfirmPassword;
-    private DatabaseHelper databaseHelper;
+    private MaterialButton btnBackLogin, btnRegister;
+    private UserDAO userDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +40,12 @@ public class RegisterActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        initUi();
+        userDAO = new UserDAO(this);
+        initListener();
+    }
 
-        databaseHelper = new DatabaseHelper(this);
+    private void initUi() {
         tilFullName = findViewById(R.id.tilFullName);
         tilEmail = findViewById(R.id.tilEmail);
         tilPassword = findViewById(R.id.tilPassword);
@@ -47,18 +54,21 @@ public class RegisterActivity extends AppCompatActivity {
         edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
         edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
-        MaterialButton btnRegister = findViewById(R.id.btnRegister);
-        MaterialButton btnBackLogin = findViewById(R.id.btnBackLogin);
+        btnRegister = findViewById(R.id.btnRegister);
+        btnBackLogin = findViewById(R.id.btnBackLogin);
+    }
 
+    private void initListener() {
         btnRegister.setOnClickListener(v -> register());
         btnBackLogin.setOnClickListener(v -> finish());
     }
 
+
     private void register() {
-        String fullName = getText(edtFullName);
-        String email = getText(edtEmail).toLowerCase();
-        String password = getText(edtPassword);
-        String confirmPassword = getText(edtConfirmPassword);
+        String fullName = edtFullName.getText().toString().trim();
+        String email = edtEmail.getText().toString().trim().toLowerCase();
+        String password = edtPassword.getText().toString().trim();
+        String confirmPassword = edtConfirmPassword.getText().toString().trim();
 
         clearErrors();
 
@@ -77,7 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        if (databaseHelper.isEmailExists(email)) {
+        if (userDAO.isEmailExists(email)) {
             tilEmail.setError("Email đã tồn tại");
             return;
         }
@@ -97,7 +107,12 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        boolean success = databaseHelper.insertUser(fullName, email, password);
+        User user = new User();
+        user.setHoTen(fullName);
+        user.setEmail(email);
+        user.setMatKhau(password);
+
+        boolean success = userDAO.insert(user);
         if (success) {
             Toast.makeText(this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
             finish();
@@ -111,12 +126,5 @@ public class RegisterActivity extends AppCompatActivity {
         tilEmail.setError(null);
         tilPassword.setError(null);
         tilConfirmPassword.setError(null);
-    }
-
-    private String getText(TextInputEditText editText) {
-        if (editText.getText() == null) {
-            return "";
-        }
-        return editText.getText().toString().trim();
     }
 }

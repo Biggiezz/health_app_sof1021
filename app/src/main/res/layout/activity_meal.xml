@@ -10,14 +10,15 @@
         android:id="@+id/toolbarMeal"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/design_default_color_primary"
+        android:background="@color/primary"
         app:navigationIcon="?attr/homeAsUpIndicator"
         app:title="Chế độ ăn uống"
         app:titleTextColor="@color/white" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,20 +30,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Ngày ăn"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtNgayAn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="yyyy-MM-dd"
-                android:inputType="date" />
+                android:hint="Chọn ngày (dd-MM-yyyy)"
+                android:inputType="none"
+                android:focusable="false"
+                android:clickable="true" />
 
             <Button
                 android:id="@+id/btnXemTheoNgay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:backgroundTint="@color/primary"
                 android:text="Xem theo ngày" />
 
             <TextView
@@ -50,6 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="Bữa ăn"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
             <Spinner
@@ -62,6 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="Món ăn"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
             <Spinner
@@ -75,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Calo: 0"
-                android:textColor="@color/design_default_color_primary"
+                android:textColor="@color/primary"
                 android:textStyle="bold" />
 
             <TextView
@@ -83,6 +90,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="Số lượng"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
             <EditText
@@ -98,6 +106,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:backgroundTint="@color/primary"
                 android:text="Thêm món ăn" />
 
             <TextView
@@ -106,6 +115,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Tổng calo hôm nay: 0"
+                android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -114,6 +124,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="Danh sách món đã lưu"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
             <ListView

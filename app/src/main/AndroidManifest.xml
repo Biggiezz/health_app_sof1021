@@ -13,16 +13,16 @@
         android:theme="@style/Theme.Health_app_sof1021"
         tools:targetApi="31">
         <activity
-            android:name=".NotificationActivity"
+            android:name=".activity.NotificationActivity"
             android:exported="false" />
         <activity
-            android:name=".ExerciseActivity"
+            android:name=".activity.ExerciseActivity"
             android:exported="false" />
         <activity
-            android:name=".ProfileActivity"
+            android:name=".activity.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".Splash"
+            android:name=".activity.Splash"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,22 +31,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MealActivity"
+            android:name=".activity.MealActivity"
             android:exported="false" />
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".activity.ForgotPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".ResetPasswordActivity"
+            android:name=".activity.ResetPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activity.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:exported="false" />
     </application>
 
