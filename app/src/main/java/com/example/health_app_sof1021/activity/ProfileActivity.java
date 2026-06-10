@@ -2,12 +2,14 @@ package com.example.health_app_sof1021.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.health_app_sof1021.R;
@@ -21,7 +23,7 @@ import java.util.Locale;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private ImageView  ivBack;
+    private ImageView ivBack, ivProfile;
     private TextView tvUserName, tvEmail, tvHeightValue, tvWeightValue;
     private LinearLayout btnChangePassword, btnLogout;
     private SessionManager sessionManager;
@@ -51,6 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void initUi() {
         ivBack = findViewById(R.id.ivBack);
+        ivProfile = findViewById(R.id.ivProfile);
         tvUserName = findViewById(R.id.tvUserName);
         tvEmail = findViewById(R.id.tvEmail);
         tvHeightValue = findViewById(R.id.tvHeightValue);
@@ -98,9 +101,54 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
-        btnChangePassword.setOnClickListener(v -> {
-            startActivity(new Intent(ProfileActivity.this, ChangePasswordActivity.class));
-        });
+        btnChangePassword.setOnClickListener(v -> startActivity(new Intent(ProfileActivity.this, ChangePasswordActivity.class)));
         ivBack.setOnClickListener(v -> finish());
+        ivProfile.setOnClickListener(v -> showEditProfileDialog());
+    }
+
+    private void showEditProfileDialog() {
+        int userId = sessionManager.getUserId();
+        User user = userDAO.getUserById(userId);
+        if (user == null) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Chỉnh sửa thông tin cá nhân");
+
+        // Tạo layout cho Dialog
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(60, 40, 60, 20);
+
+        final EditText edtName = new EditText(this);
+        edtName.setHint("Họ tên");
+        edtName.setText(user.getHoTen());
+        layout.addView(edtName);
+
+        final EditText edtEmail = new EditText(this);
+        edtEmail.setHint("Email");
+        edtEmail.setText(user.getEmail());
+        layout.addView(edtEmail);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Lưu", (dialog, which) -> {
+            String newName = edtName.getText().toString().trim();
+            String newEmail = edtEmail.getText().toString().trim();
+
+            if (newName.isEmpty() || newEmail.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (userDAO.updateUserInfo(userId, newName, newEmail)) {
+                Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                loadUserInfo(); // Cập nhật lại UI
+            } else {
+                Toast.makeText(this, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
+        builder.create().show();
     }
 }

@@ -142,4 +142,19 @@ public class UserDAO {
         );
         return result > 0;
     }
+
+    public boolean updateUserInfo(int userId, String hoTen, String email) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COL_HO_TEN, hoTen);
+        values.put(DatabaseHelper.COL_EMAIL, email);
+
+        int result = db.update(
+                DatabaseHelper.TABLE_USER,
+                values,
+                DatabaseHelper.COL_USER_ID + " = ?",
+                new String[]{String.valueOf(userId)}
+        );
+        return result > 0;
+    }
 }
