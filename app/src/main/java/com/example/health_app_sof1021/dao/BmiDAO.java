@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BmiDAO {
-    private DatabaseHelper dbHelper;
+    private final DatabaseHelper dbHelper;
 
     public BmiDAO(Context context) {
         dbHelper = new DatabaseHelper(context);
@@ -36,9 +36,9 @@ public class BmiDAO {
         Cursor cursor = db.query(DatabaseHelper.TABLE_BMI_RECORD, null,
                 DatabaseHelper.COL_BMI_USER_ID + " = ?",
                 new String[]{String.valueOf(userId)}, null, null,
-                DatabaseHelper.COL_NGAY_DO + " DESC");
+                DatabaseHelper.COL_BMI_ID + " DESC");
 
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             do {
                 BmiRecord r = new BmiRecord();
                 r.setBmiId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BMI_ID)));
@@ -50,9 +50,7 @@ public class BmiDAO {
                 list.add(r);
             } while (cursor.moveToNext());
         }
-        if (cursor != null) {
-            cursor.close();
-        }
+        cursor.close();
         return list;
     }
 
@@ -68,12 +66,12 @@ public class BmiDAO {
                 new String[]{String.valueOf(userId)},
                 null,
                 null,
-                DatabaseHelper.COL_NGAY_DO + " DESC",
+                DatabaseHelper.COL_BMI_ID + " DESC",
                 "1"
         );
 
         BmiRecord bmi = null;
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             bmi = new BmiRecord();
             bmi.setBmiId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BMI_ID)));
             bmi.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BMI_USER_ID)));
@@ -83,9 +81,7 @@ public class BmiDAO {
             bmi.setNgayDo(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NGAY_DO)));
         }
 
-        if (cursor != null) {
-            cursor.close();
-        }
+        cursor.close();
         return bmi;
     }
 }

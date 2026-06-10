@@ -39,8 +39,14 @@ public class ProfileActivity extends AppCompatActivity {
         userDAO = new UserDAO(this);
         bmiDAO = new BmiDAO(this);
 
-        loadUserInfo();
         setupClickListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Cập nhật lại thông tin mỗi khi quay lại màn hình Profile
+        loadUserInfo();
     }
 
     private void initUi() {
@@ -61,6 +67,8 @@ public class ProfileActivity extends AppCompatActivity {
     private void loadUserInfo() {
         int userId = sessionManager.getUserId();
         User user = userDAO.getUserById(userId);
+        
+        // Lấy bản ghi BMI mới nhất (chứa chiều cao/cân nặng mới nhất)
         BmiRecord bmi = bmiDAO.getBMIByUserId(userId);
 
         if (user == null) {
@@ -69,6 +77,7 @@ public class ProfileActivity extends AppCompatActivity {
             Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+            finish();
             return;
         }
 
@@ -79,19 +88,19 @@ public class ProfileActivity extends AppCompatActivity {
             tvHeightValue.setText(String.format(Locale.getDefault(), "%.1f cm", bmi.getChieuCao()));
             tvWeightValue.setText(String.format(Locale.getDefault(), "%.1f kg", bmi.getCanNang()));
         } else {
-            tvHeightValue.setText("0 cm");
-            tvWeightValue.setText("0 kg");
+            tvHeightValue.setText("-- cm");
+            tvWeightValue.setText("-- kg");
         }
     }
 
     private void setupClickListeners() {
-
         btnLogout.setOnClickListener(v -> {
             sessionManager.logoutUser();
             Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+            finish();
         });
         ivBack.setOnClickListener(v -> finish());
     }

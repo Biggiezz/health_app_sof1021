@@ -18,9 +18,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.health_app_sof1021.R;
 import com.example.health_app_sof1021.dao.WaterDAO;
@@ -55,19 +52,7 @@ public class WaterActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_water);
 
-        tvCurrent.findViewById(R.id.tvWaterCurrent);
-        tvTarget.findViewById(R.id.tvWaterTarget);
-        pbWater.findViewById(R.id.pbWater);
-        btn100.findViewById(R.id.btnAdd100);
-        btn250.findViewById(R.id.btnAdd250);
-        btn500.findViewById(R.id.btnAdd500);
-        btnCustomAdd.findViewById(R.id.btnCustomAdd);
-        edCustomWater.findViewById(R.id.edCustomWater);
-        swWaterReminder.findViewById(R.id.swWaterReminder);
-        spnWaterInterval.findViewById(R.id.spnWaterInterval);
-        layoutInterval.findViewById(R.id.layoutInterval);
-        btnSaveReminder.findViewById(R.id.btnSaveReminder);
-        toolbarWater.findViewById(R.id.toolbarWater);
+        initUi();
 
         dbHelper = new DatabaseHelper(this);
         waterDAO = new WaterDAO(this);
@@ -104,6 +89,22 @@ public class WaterActivity extends AppCompatActivity {
         });
 
         btnSaveReminder.setOnClickListener(v -> saveReminderSettings());
+    }
+
+    private void initUi() {
+        tvCurrent.findViewById(R.id.tvWaterCurrent);
+        tvTarget.findViewById(R.id.tvWaterTarget);
+        pbWater.findViewById(R.id.pbWater);
+        btn100.findViewById(R.id.btnAdd100);
+        btn250.findViewById(R.id.btnAdd250);
+        btn500.findViewById(R.id.btnAdd500);
+        btnCustomAdd.findViewById(R.id.btnCustomAdd);
+        edCustomWater.findViewById(R.id.edCustomWater);
+        swWaterReminder.findViewById(R.id.swWaterReminder);
+        spnWaterInterval.findViewById(R.id.spnWaterInterval);
+        layoutInterval.findViewById(R.id.layoutInterval);
+        btnSaveReminder.findViewById(R.id.btnSaveReminder);
+        toolbarWater.findViewById(R.id.toolbarWater);
     }
 
     private void loadTargetAndReminder() {
@@ -155,7 +156,8 @@ public class WaterActivity extends AppCompatActivity {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // Kiểm tra xem bản ghi đã tồn tại chưa
-        Cursor cursor = db.rawQuery("SELECT * FROM Reminder WHERE userId = ? AND loaiNhacNho = ?", new String[]{String.valueOf(userId), "Uống nước"});
+        Cursor cursor = db.rawQuery("SELECT * FROM Reminder WHERE userId = ? AND loaiNhacNho = ?",
+                new String[]{String.valueOf(userId), "Uống nước"});
         boolean exists = cursor.getCount() > 0;
         cursor.close();
 

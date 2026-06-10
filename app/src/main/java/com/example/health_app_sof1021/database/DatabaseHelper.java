@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "HealthApp.db";
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
 
     public static final String TABLE_USER = "User";
     public static final String COL_USER_ID = "userId";
@@ -82,6 +82,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             createExerciseTable(db);
         }
         if (oldVersion < 5) createNotificationTable(db);
+        if (oldVersion < 10) createHealthRecordTable(db);
     }
 
     private void createMealPlanTable(SQLiteDatabase db) {
@@ -109,13 +110,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void createHealthRecordTable(SQLiteDatabase db) {
-        String createTableHealthRecord = "CREATE TABLE IF NOT EXISTS " + TABLE_HEALTH_RECORD + " ("
-                + COL_RECORD_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, "
+        String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_HEALTH_RECORD + " ("
+                + COL_RECORD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COL_HEALTH_USER_ID + " INTEGER, "
                 + COL_LUONG_NUOC + " INTEGER, "
                 + COL_NGAY_GHI_NHAN + " TEXT, "
-                + "FOREIGN KEY(" + COL_BMI_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
-        db.execSQL(createTableHealthRecord);
+                + "FOREIGN KEY(" + COL_HEALTH_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
+        db.execSQL(sql);
     }
 
     private void createExerciseTable(SQLiteDatabase db) {

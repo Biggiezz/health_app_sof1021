@@ -1,7 +1,5 @@
 package com.example.health_app_sof1021.activity;
 
-import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.health_app_sof1021.R;
 import com.example.health_app_sof1021.adapter.BmiAdapter;
 import com.example.health_app_sof1021.dao.BmiDAO;
-import com.example.health_app_sof1021.database.DatabaseHelper;
 import com.example.health_app_sof1021.model.BmiRecord;
+import com.example.health_app_sof1021.utils.SessionManager;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.SimpleDateFormat;
@@ -34,8 +32,6 @@ public class BmiActivity extends AppCompatActivity {
     int userId;
     BmiDAO bmiDAO;
     BmiAdapter adapter;
-    DatabaseHelper dbHelper;
-    SQLiteDatabase db;
 
 
     @Override
@@ -53,8 +49,8 @@ public class BmiActivity extends AppCompatActivity {
 
 
         bmiDAO = new BmiDAO(this);
-        SharedPreferences pref = getSharedPreferences("USER_INFO", MODE_PRIVATE);
-        userId = pref.getInt("userId", -1);
+        SessionManager sessionManager = new SessionManager(this);
+        userId = sessionManager.getUserId();
 
         toolbar.setNavigationOnClickListener(v -> finish());
         rvHistory.setLayoutManager(new LinearLayoutManager(this));
