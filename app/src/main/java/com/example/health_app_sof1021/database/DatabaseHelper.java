@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "HealthApp.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     public static final String TABLE_USER = "User";
     public static final String COL_USER_ID = "userId";
@@ -56,6 +56,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createMealPlanTable(db);
         createExerciseTable(db);
         createNotificationTable(db);
+        createBMIRecordTable(db);
+
+        String createTableBMIRecord = "CREATE TABLE BMIRecord (" +
+                "BmiID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "userId INTEGER, " +
+                "chieuCao REAL, " +
+                "canNang REAL, " +
+                "chiSoBMI REAL, " +
+                "ngayDo TEXT, " +
+                "FOREIGN KEY(userId) REFERENCES User(UserID))";
+        db.execSQL(createTableBMIRecord);
     }
 
     @Override
@@ -86,6 +97,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_SO_LUONG + " INTEGER NOT NULL, "
                 + COL_NGAY_AN + " TEXT NOT NULL)";
         db.execSQL(sql);
+    }
+
+    private void createBMIRecordTable(SQLiteDatabase db) {
+        String createTableBMIRecord = "CREATE TABLE BMIRecord (" +
+                "BmiID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "userId INTEGER, " +
+                "chieuCao REAL, " +
+                "canNang REAL, " +
+                "chiSoBMI REAL, " +
+                "ngayDo TEXT, " +
+                "FOREIGN KEY(userId) REFERENCES User(UserID))";
+        db.execSQL(createTableBMIRecord);
     }
 
     private void createExerciseTable(SQLiteDatabase db) {
