@@ -94,10 +94,11 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     // Hàm tìm kiếm dữ liệu theo ngày
-    private void searchHealthData(String date) {
+    private void searchHealthData(String displayDate) {
         boolean hasData = false;
 
-        StatisticsDAO.BmiStatistics bmi = statisticsDAO.getBmiStatisticsByDate(userId, date);
+        String queryDate = convertDateFormat(displayDate);
+        StatisticsDAO.BmiStatistics bmi = statisticsDAO.getBmiStatisticsByDate(userId, queryDate);
         if (bmi != null) {
             hasData = true;
             tvResultBMI.setText(String.format(Locale.getDefault(),
@@ -108,7 +109,7 @@ public class StatisticsActivity extends AppCompatActivity {
             tvResultBMI.setVisibility(View.GONE);
         }
 
-        int waterSum = statisticsDAO.getWaterAmountByDate(userId, date);
+        int waterSum = statisticsDAO.getWaterAmountByDate(userId, queryDate);
         if (waterSum > 0) {
             hasData = true;
             tvResultWater.setText("Lượng nước đã uống: " + waterSum + " ml");
@@ -117,7 +118,7 @@ public class StatisticsActivity extends AppCompatActivity {
             tvResultWater.setVisibility(View.GONE);
         }
 
-        int caloSum = statisticsDAO.getCaloriesByDate(userId, date);
+        int caloSum = statisticsDAO.getCaloriesByDate(userId, queryDate);
         if (caloSum > 0) {
             hasData = true;
             tvResultMeals.setText("Tổng lượng Calo bữa ăn: " + caloSum + " kcal");
@@ -126,7 +127,7 @@ public class StatisticsActivity extends AppCompatActivity {
             tvResultMeals.setVisibility(View.GONE);
         }
 
-        StatisticsDAO.ExerciseStatistics exercise = statisticsDAO.getExerciseStatisticsByDate(userId, date);
+        StatisticsDAO.ExerciseStatistics exercise = statisticsDAO.getExerciseStatisticsByDate(userId, queryDate);
         if (exercise.getTotal() > 0) {
             hasData = true;
             tvResultExercises.setText("Bài tập đã hoàn thành: "
@@ -137,10 +138,10 @@ public class StatisticsActivity extends AppCompatActivity {
         }
 
         if (hasData) {
-            tvResultTitle.setText("Dữ liệu ghi nhận ngày " + date + ":");
+            tvResultTitle.setText("Dữ liệu ghi nhận ngày " + displayDate + ":");
             layoutResult.setVisibility(View.VISIBLE);
         } else {
-            tvResultTitle.setText("Ngày " + date + ": Không có dữ liệu ghi nhận nào!");
+            tvResultTitle.setText("Ngày " + displayDate + ": Không có dữ liệu ghi nhận nào!");
             tvResultBMI.setVisibility(View.GONE);
             tvResultWater.setVisibility(View.GONE);
             tvResultMeals.setVisibility(View.GONE);
@@ -224,5 +225,19 @@ public class StatisticsActivity extends AppCompatActivity {
 
         barChart.invalidate();
 
+    }
+
+    private String convertDateFormat(String dateStr) {
+        try {
+            // Định dạng ban đầu của selectedSearchDate là dd/MM/yyyy
+            SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            // Định dạng cần đổi sang để truy vấn DB là yyyy-MM-dd
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date date = inputFormat.parse(dateStr);
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return dateStr; // Trả về chuỗi gốc nếu xảy ra lỗi
+        }
     }
 }

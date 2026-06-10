@@ -108,7 +108,7 @@ public class StatisticsDAO {
 
     public List<Integer> getRecentWaterAmounts(int userId, int days) {
         List<Integer> waterAmounts = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
         for (int i = days - 1; i >= 0; i--) {
             Calendar cal = Calendar.getInstance();
