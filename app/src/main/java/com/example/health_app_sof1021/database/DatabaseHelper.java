@@ -67,6 +67,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "ngayDo TEXT, " +
                 "FOREIGN KEY(userId) REFERENCES User(UserID))";
         db.execSQL(createTableBMIRecord);
+
+        String createTableHealthRecord = "CREATE TABLE HealthRecord (" +
+                "RecordID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "userId INTEGER, " +
+                "luongNuoc INTEGER, " +
+                "ngayGhiNhan TEXT, " +
+                "FOREIGN KEY(userId) REFERENCES User(UserID))";
+        db.execSQL(createTableHealthRecord);
     }
 
     @Override
