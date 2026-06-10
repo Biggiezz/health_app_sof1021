@@ -11,10 +11,10 @@
         android:id="@+id/toolbarBmi"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
+        android:background="@color/primary"
         app:title="Theo Dõi Cân Nặng &amp; BMI"
         app:titleTextColor="@color/white"
-        app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:navigationIcon="@drawable/ic_back"
         app:navigationIconTint="@color/white"/>
 
     <ScrollView
