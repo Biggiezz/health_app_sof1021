@@ -1,4 +1,4 @@
-package com.example.health_app_sof1021;
+package com.example.health_app_sof1021.activity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,17 +11,21 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.health_app_sof1021.database.DatabaseHelper;
+import com.example.health_app_sof1021.R;
+import com.example.health_app_sof1021.dao.UserDAO;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class ResetPasswordActivity extends AppCompatActivity {
+    private TextView tvEmail;
     private TextInputLayout tilNewPassword;
     private TextInputLayout tilConfirmPassword;
     private TextInputEditText edtNewPassword;
     private TextInputEditText edtConfirmPassword;
-    private DatabaseHelper databaseHelper;
+    private MaterialButton btnResetPassword;
+    private MaterialButton btnBackLogin;
+    private UserDAO userDAO;
     private String email;
 
     @Override
@@ -34,19 +38,13 @@ public class ResetPasswordActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        initUi();
+        userDAO = new UserDAO(this);
 
-        databaseHelper = new DatabaseHelper(this);
-        TextView tvEmail = findViewById(R.id.tvEmail);
-        tilNewPassword = findViewById(R.id.tilNewPassword);
-        tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
-        edtNewPassword = findViewById(R.id.edtNewPassword);
-        edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
-        MaterialButton btnResetPassword = findViewById(R.id.btnResetPassword);
-        MaterialButton btnBackLogin = findViewById(R.id.btnBackLogin);
 
         email = getIntent().getStringExtra("email");
 
-        if (TextUtils.isEmpty(email) || !databaseHelper.isEmailExists(email)) {
+        if (TextUtils.isEmpty(email) || !userDAO.isEmailExists(email)) {
             Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_LONG).show();
             finish();
             return;
@@ -55,6 +53,16 @@ public class ResetPasswordActivity extends AppCompatActivity {
         tvEmail.setText("Tài khoản: " + email);
         btnResetPassword.setOnClickListener(v -> resetPassword());
         btnBackLogin.setOnClickListener(v -> finish());
+    }
+
+    private void initUi() {
+        tvEmail = findViewById(R.id.tvEmail);
+        tilNewPassword = findViewById(R.id.tilNewPassword);
+        tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
+        edtNewPassword = findViewById(R.id.edtNewPassword);
+        edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
+        btnResetPassword = findViewById(R.id.btnResetPassword);
+        btnBackLogin = findViewById(R.id.btnBackLogin);
     }
 
     private void resetPassword() {
@@ -79,7 +87,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             return;
         }
 
-        boolean success = databaseHelper.updatePasswordByEmail(email, newPassword);
+        boolean success = userDAO.updatePasswordByEmail(email, newPassword);
         if (success) {
             Toast.makeText(this, "Đổi mật khẩu thành công", Toast.LENGTH_SHORT).show();
             finish();

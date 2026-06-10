@@ -21,6 +21,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHo
 
     public interface OnExerciseClickListener {
         void onDeleteClick(Exercise exercise);
+        void onItemClick(Exercise exercise);
     }
 
     public ExerciseAdapter(List<Exercise> exerciseList, OnExerciseClickListener listener) {
@@ -38,9 +39,15 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Exercise exercise = exerciseList.get(position);
-        holder.tvName.setText(exercise.getName());
-        holder.tvDetail.setText(exercise.getDuration() + " phút • " + exercise.getCalories() + " kcal");
+        holder.tvName.setText(exercise.getTenBaiTap());
+        holder.tvDetail.setText(exercise.getNgayTap() + " • " + exercise.getGioTap());
         
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(exercise);
+            }
+        });
+
         holder.btnDelete.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteClick(exercise);

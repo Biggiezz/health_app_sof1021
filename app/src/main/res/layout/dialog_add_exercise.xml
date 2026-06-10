@@ -5,30 +5,47 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <EditText
-        android:id="@+id/etExName"
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tên bài tập (VD: Chạy bộ)"
-        android:inputType="text"
-        android:minHeight="48dp" />
+        android:hint="Tên bài tập (VD: Chạy bộ)">
 
-    <EditText
-        android:id="@+id/etExDuration"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etExName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:hint="Thời gian (phút)"
-        android:inputType="number"
-        android:minHeight="48dp" />
+        android:hint="Ngày tập">
 
-    <EditText
-        android:id="@+id/etExCalories"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etExDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="false" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:hint="Calo tiêu thụ (kcal)"
-        android:inputType="number"
-        android:minHeight="48dp" />
+        android:hint="Giờ tập">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etExTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="false" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

@@ -3,37 +3,67 @@ package com.example.health_app_sof1021.model;
 public class Exercise {
     private int id;
     private int userId;
-    private String name;
-    private int duration; // in minutes
-    private int calories;
-    private String date;
+    private String tenBaiTap;
+    private String ngayTap;
+    private String gioTap;
+    private int trangThai; // 0: chưa tập, 1: đã tập
 
     public Exercise() {}
 
-    public Exercise(int id, int userId, String name, int duration, int calories, String date) {
+    public Exercise(int id, int userId, String tenBaiTap, String ngayTap, String gioTap, int trangThai) {
         this.id = id;
         this.userId = userId;
-        this.name = name;
-        this.duration = duration;
-        this.calories = calories;
-        this.date = date;
+        this.tenBaiTap = tenBaiTap;
+        this.ngayTap = ngayTap;
+        this.gioTap = gioTap;
+        this.trangThai = trangThai;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public int getUserId() {
+        return userId;
+    }
 
-    public int getDuration() { return duration; }
-    public void setDuration(int duration) { this.duration = duration; }
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-    public int getCalories() { return calories; }
-    public void setCalories(int calories) { this.calories = calories; }
+    public String getTenBaiTap() {
+        return tenBaiTap;
+    }
 
-    public String getDate() { return date; }
-    public void setDate(String date) { this.date = date; }
+    public void setTenBaiTap(String tenBaiTap) {
+        this.tenBaiTap = tenBaiTap;
+    }
+
+    public String getNgayTap() {
+        return ngayTap;
+    }
+
+    public void setNgayTap(String ngayTap) {
+        this.ngayTap = ngayTap;
+    }
+
+    public String getGioTap() {
+        return gioTap;
+    }
+
+    public void setGioTap(String gioTap) {
+        this.gioTap = gioTap;
+    }
+
+    public int getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(int trangThai) {
+        this.trangThai = trangThai;
+    }
 }

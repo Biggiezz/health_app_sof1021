@@ -53,12 +53,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         if (notification.getDaDoc() == 0) {
             // Chưa đọc: In đậm và màu nền trắng/nổi bật
             holder.tvTitle.setTypeface(null, Typeface.BOLD);
-            holder.cardNotification.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white));
+            holder.cardNotification.setCardBackgroundColor(ContextCompat.getColor(context, R.color.primary));
             holder.btnMarkRead.setVisibility(View.VISIBLE);
         } else {
             // Đã đọc: Trở về màu nguyên bản (surface) và font bình thường
             holder.tvTitle.setTypeface(null, Typeface.NORMAL);
-            holder.cardNotification.setCardBackgroundColor(ContextCompat.getColor(context, R.color.surface));
+            holder.cardNotification.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white));
             holder.btnMarkRead.setVisibility(View.GONE);
         }
 

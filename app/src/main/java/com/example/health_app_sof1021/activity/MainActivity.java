@@ -1,4 +1,4 @@
-package com.example.health_app_sof1021;
+package com.example.health_app_sof1021.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.health_app_sof1021.R;
 import com.google.android.material.card.MaterialCardView;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,10 +28,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         initUi();
-        initEvent();
+        initListener();
     }
 
-    private void initEvent() {
+    private void initListener() {
         btnCardMeals.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MealActivity.class)));
         btnCardExercise.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ExerciseActivity.class)));
         btnCardProfile.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProfileActivity.class)));
