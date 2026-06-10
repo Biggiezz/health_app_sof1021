@@ -30,7 +30,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
     private static final int DEFAULT_CALORIE_TARGET = 2200;
 
-    private MaterialCardView btnCardBMI, btnCardMeals, btnCardExercise, btnCardProfile, btnCardWater;
+    private MaterialCardView btnCardBMI, btnCardMeals, btnCardExercise, btnCardProfile, btnCardWater, btnCardStats;
     private FrameLayout btnCardNotification;
     private TextView tvHomeName, tvHomeHeightWeight, tvHomeBMIClass, tvHomeBMIValue;
     private TextView tvHomeWaterProgress, tvHomeCaloProgress, tvHomeWorkoutProgress;
@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         btnCardNotification = findViewById(R.id.btnCardNotification);
         btnCardProfile = findViewById(R.id.btnCardProfile);
         btnCardWater = findViewById(R.id.btnCardWater);
+        btnCardStats = findViewById(R.id.btnCardStats);
 
         tvHomeName = findViewById(R.id.tvHomeName);
         tvHomeHeightWeight = findViewById(R.id.tvHomeHeightWeight);
@@ -167,5 +168,6 @@ public class MainActivity extends AppCompatActivity {
         btnCardProfile.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProfileActivity.class)));
         btnCardNotification.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, NotificationActivity.class)));
         btnCardWater.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, WaterActivity.class)));
+        btnCardStats.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, StatisticsActivity.class)));
     }
 }

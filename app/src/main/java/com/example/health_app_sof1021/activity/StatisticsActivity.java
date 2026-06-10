@@ -1,9 +1,6 @@
 package com.example.health_app_sof1021.activity;
 
 import android.app.DatePickerDialog;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -14,19 +11,21 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.health_app_sof1021.utils.SessionManager;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.example.health_app_sof1021.R;
 import com.example.health_app_sof1021.dao.BmiDAO;
-import com.example.health_app_sof1021.dao.WaterDAO;
-import com.example.health_app_sof1021.database.DatabaseHelper;
+import com.example.health_app_sof1021.dao.StatisticsDAO;
 import com.example.health_app_sof1021.model.BmiRecord;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.SimpleDateFormat;
@@ -44,8 +43,7 @@ public class StatisticsActivity extends AppCompatActivity {
     LinearLayout layoutResult;
     MaterialToolbar toolbar;
     BmiDAO bmiDAO;
-    WaterDAO waterDAO;
-    DatabaseHelper dbHelper;
+    StatisticsDAO statisticsDAO;
     int userId;
     String selectedSearchDate;
 
@@ -69,11 +67,10 @@ public class StatisticsActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbarStats);
 
         bmiDAO = new BmiDAO(this);
-        waterDAO = new WaterDAO(this);
-        dbHelper = new DatabaseHelper(this);
+        statisticsDAO = new StatisticsDAO(this);
+        SessionManager sessionManager = new SessionManager(this);
+        userId = sessionManager.getUserId();
 
-        SharedPreferences pref = getSharedPreferences("USER_INFO", MODE_PRIVATE);
-        userId = pref.getInt("userId", -1);
         toolbar.setNavigationOnClickListener(v -> finish());
 
         // Mặc định chọn ngày hiện tại để tìm kiếm
@@ -98,85 +95,46 @@ public class StatisticsActivity extends AppCompatActivity {
 
     // Hàm tìm kiếm dữ liệu theo ngày
     private void searchHealthData(String date) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
         boolean hasData = false;
 
-        // 1. Truy vấn BMI trong ngày
-        double weight = 0, height = 0, bmiVal = 0;
-        Cursor cBmi = db.rawQuery("SELECT canNang, chieuCao, chiSoBMI FROM BMIRecord WHERE userId = ? AND ngayDo = ? ORDER BY BmiID DESC LIMIT 1",
-                new String[]{String.valueOf(userId), date});
-        if (cBmi.moveToFirst()) {
-            weight = cBmi.getDouble(0);
-            height = cBmi.getDouble(1);
-            bmiVal = cBmi.getDouble(2);
+        StatisticsDAO.BmiStatistics bmi = statisticsDAO.getBmiStatisticsByDate(userId, date);
+        if (bmi != null) {
             hasData = true;
-            tvResultBMI.setText(String.format(Locale.getDefault(), "BMI: %.2f | Cân nặng: %.1f kg | Chiều cao: %.1f cm", bmiVal, weight, height));
+            tvResultBMI.setText(String.format(Locale.getDefault(),
+                    "BMI: %.2f | Cân nặng: %.1f kg | Chiều cao: %.1f cm",
+                    bmi.getBmi(), bmi.getWeight(), bmi.getHeight()));
             tvResultBMI.setVisibility(View.VISIBLE);
         } else {
             tvResultBMI.setVisibility(View.GONE);
         }
-        cBmi.close();
 
-        // 2. Truy vấn Nước uống trong ngày
-        int waterSum = 0;
-        Cursor cWater = db.rawQuery("SELECT SUM(luongNuoc) FROM HealthRecord WHERE userId = ? AND ngayGhiNhan = ?",
-                new String[]{String.valueOf(userId), date});
-        if (cWater.moveToFirst()) {
-            waterSum = cWater.getInt(0);
-            if (waterSum > 0) {
-                hasData = true;
-                tvResultWater.setText("Lượng nước đã uống: " + waterSum + " ml");
-                tvResultWater.setVisibility(View.VISIBLE);
-            } else {
-                tvResultWater.setVisibility(View.GONE);
-            }
+        int waterSum = statisticsDAO.getWaterAmountByDate(userId, date);
+        if (waterSum > 0) {
+            hasData = true;
+            tvResultWater.setText("Lượng nước đã uống: " + waterSum + " ml");
+            tvResultWater.setVisibility(View.VISIBLE);
         } else {
             tvResultWater.setVisibility(View.GONE);
         }
-        cWater.close();
 
-        // 3. Truy vấn Bữa ăn trong ngày
-        int caloSum = 0;
-        Cursor cMeals = db.rawQuery("SELECT SUM(hamLuongCalo) FROM MealPlan WHERE userId = ? AND ngayAn = ?",
-                new String[]{String.valueOf(userId), date});
-        if (cMeals.moveToFirst()) {
-            caloSum = cMeals.getInt(0);
-            if (caloSum > 0) {
-                hasData = true;
-                tvResultMeals.setText("Tổng lượng Calo bữa ăn: " + caloSum + " kcal");
-                tvResultMeals.setVisibility(View.VISIBLE);
-            } else {
-                tvResultMeals.setVisibility(View.GONE);
-            }
+        int caloSum = statisticsDAO.getCaloriesByDate(userId, date);
+        if (caloSum > 0) {
+            hasData = true;
+            tvResultMeals.setText("Tổng lượng Calo bữa ăn: " + caloSum + " kcal");
+            tvResultMeals.setVisibility(View.VISIBLE);
         } else {
             tvResultMeals.setVisibility(View.GONE);
         }
-        cMeals.close();
 
-        // 4. Truy vấn Tập luyện trong ngày
-        int totalEx = 0;
-        int completedEx = 0;
-        Cursor cEx = db.rawQuery("SELECT trangThai FROM Exercise WHERE userId = ? AND ngayTap = ?",
-                new String[]{String.valueOf(userId), date});
-        if (cEx.moveToFirst()) {
-            do {
-                totalEx++;
-                if ("Đã tập".equals(cEx.getString(0))) {
-                    completedEx++;
-                }
-            } while (cEx.moveToNext());
-
-            if (totalEx > 0) {
-                hasData = true;
-                tvResultExercises.setText("Bài tập đã hoàn thành: " + completedEx + " / " + totalEx + " bài");
-                tvResultExercises.setVisibility(View.VISIBLE);
-            } else {
-                tvResultExercises.setVisibility(View.GONE);
-            }
+        StatisticsDAO.ExerciseStatistics exercise = statisticsDAO.getExerciseStatisticsByDate(userId, date);
+        if (exercise.getTotal() > 0) {
+            hasData = true;
+            tvResultExercises.setText("Bài tập đã hoàn thành: "
+                    + exercise.getCompleted() + " / " + exercise.getTotal() + " bài");
+            tvResultExercises.setVisibility(View.VISIBLE);
         } else {
             tvResultExercises.setVisibility(View.GONE);
         }
-        cEx.close();
 
         if (hasData) {
             tvResultTitle.setText("Dữ liệu ghi nhận ngày " + date + ":");
@@ -225,25 +183,19 @@ public class StatisticsActivity extends AppCompatActivity {
     }
     private void setupWaterChart(){
         ArrayList<BarEntry> entries = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        ArrayList<String> dateLabels = new ArrayList<>();
+        int recentDays = 5;
+        List<Integer> waterAmounts = statisticsDAO.getRecentWaterAmounts(userId, recentDays);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
 
-        // truy vấn lượng nước trong 5 ngày gần đây
-        int xPos = 1;
-        for (int i = 4; i >= 0; i--) {
+        for (int i = recentDays - 1; i >= 0; i--) {
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DAY_OF_YEAR, -i);
-            String dateStr = sdf.format(cal.getTime());
+            dateLabels.add(sdf.format(cal.getTime()));
+        }
 
-            int waterAmount = 0;
-            Cursor cursor = db.rawQuery("SELECT SUM(luongNuoc) FROM HealthRecord WHERE userId = ? AND ngayGhiNhan = ?",
-                    new String[]{String.valueOf(userId), dateStr});
-            if (cursor.moveToFirst()) {
-                waterAmount = cursor.getInt(0);
-            }
-            cursor.close();
-
-            entries.add(new BarEntry(xPos++, waterAmount));
+        for (int i = 0; i < waterAmounts.size(); i++) {
+            entries.add(new BarEntry(i, waterAmounts.get(i)));
         }
 
         BarDataSet dataSet = new BarDataSet(entries, "Lượng nước uống (ml)");
@@ -254,6 +206,22 @@ public class StatisticsActivity extends AppCompatActivity {
         BarData barData = new BarData(dataSet);
         barChart.setData(barData);
         barChart.getDescription().setEnabled(false);
+
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setLabelCount(dateLabels.size());
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int index = (int) value;
+                if (index < 0 || index >= dateLabels.size()) {
+                    return "";
+                }
+                return dateLabels.get(index);
+            }
+        });
+
         barChart.invalidate();
 
     }
