@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.health_app_sof1021.R;
 import com.example.health_app_sof1021.adapter.NotificationAdapter;
+import com.example.health_app_sof1021.dao.ExerciseDao;
 import com.example.health_app_sof1021.dao.NotificationDao;
 import com.example.health_app_sof1021.model.Notification;
 import com.example.health_app_sof1021.utils.SessionManager;
@@ -23,6 +24,7 @@ public class NotificationActivity extends AppCompatActivity {
     private RecyclerView rvNotifications;
     private TextView tvEmptyState;
     private NotificationDao notificationDao;
+    private ExerciseDao exerciseDao;
     private int currentUserId;
 
     @Override
@@ -34,6 +36,7 @@ public class NotificationActivity extends AppCompatActivity {
         currentUserId = sessionManager.getUserId();
 
         notificationDao = new NotificationDao(this);
+        exerciseDao = new ExerciseDao(this);
         initUi();
         loadData();
 
@@ -75,9 +78,41 @@ public class NotificationActivity extends AppCompatActivity {
 
     private void markAsRead(Notification notification) {
         if (notificationDao.updateStatus(notification.getMaThongBao(), 1)) {
+            markExerciseCompleted(notification);
             loadData();
             Toast.makeText(this, "Đã đọc", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void markExerciseCompleted(Notification notification) {
+        String title = notification.getTieuDe();
+        String content = notification.getNoiDung();
+        if (title == null || content == null || !title.toLowerCase().contains("lịch tập")) {
+            return;
+        }
+
+        String exerciseName = getExerciseNameFromTitle(title);
+        String exerciseDate = getExerciseDateFromContent(content);
+        if (!exerciseName.isEmpty() && !exerciseDate.isEmpty()) {
+            exerciseDao.markCompletedByNameAndDate(currentUserId, exerciseName, exerciseDate);
+        }
+    }
+
+    private String getExerciseNameFromTitle(String title) {
+        int index = title.indexOf(":");
+        if (index == -1 || index + 1 >= title.length()) {
+            return "";
+        }
+        return title.substring(index + 1).trim();
+    }
+
+    private String getExerciseDateFromContent(String content) {
+        String keyword = " ngày ";
+        int index = content.lastIndexOf(keyword);
+        if (index == -1) {
+            return "";
+        }
+        return content.substring(index + keyword.length()).trim();
     }
 
     private void confirmDelete(Notification notification) {

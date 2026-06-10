@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "HealthApp.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 11;
 
     public static final String TABLE_USER = "User";
     public static final String COL_USER_ID = "userId";
@@ -14,6 +14,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_EMAIL = "email";
     public static final String COL_MAT_KHAU = "matKhau";
     public static final String COL_NGAY_TAO = "ngayTao";
+
+    public static final String TABLE_BMI_RECORD = "BmiRecord";
+    public static final String COL_BMI_ID = "bmiId";
+    public static final String COL_BMI_USER_ID = "userId";
+    public static final String COL_CHIEU_CAO = "chieuCao";
+    public static final String COL_CAN_NANG = "canNang";
+    public static final String COL_CHI_SO_BMI = "chiSoBMI";
+    public static final String COL_NGAY_DO = "ngayDo";
+
+    public static final String TABLE_HEALTH_RECORD = "HealthRecord";
+    public static final String COL_RECORD_ID = "recordId";
+    public static final String COL_HEALTH_USER_ID = "userId";
+    public static final String COL_LUONG_NUOC = "luongNuoc";
+    public static final String COL_NGAY_GHI_NHAN = "ngayGhiNhan";
 
     public static final String TABLE_MEAL_PLAN = "MealPlan";
     public static final String COL_MEAL_ID = "mealId";
@@ -40,40 +54,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_NOTIF_DATE = "ngayThongBao";
     public static final String COL_NOTIF_IS_READ = "daDoc";
 
+    public static final String TABLE_REMINDER = "Reminder";
+    public static final String COL_REMINDER_ID = "reminderId";
+    public static final String COL_REMINDER_USER_ID = "userId";
+    public static final String COL_REMINDER_TYPE = "loaiNhacNho";
+    public static final String COL_REMINDER_TIME = "gioNhac";
+    public static final String COL_REMINDER_STATUS = "trangThai";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createUserTable = "CREATE TABLE " + TABLE_USER + " ("
-                + COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COL_HO_TEN + " TEXT NOT NULL, "
-                + COL_EMAIL + " TEXT UNIQUE NOT NULL, "
-                + COL_MAT_KHAU + " TEXT NOT NULL, "
-                + COL_NGAY_TAO + " TEXT DEFAULT CURRENT_TIMESTAMP)";
+        String createUserTable = "CREATE TABLE " + TABLE_USER + " (" + COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_HO_TEN + " TEXT NOT NULL, " + COL_EMAIL + " TEXT UNIQUE NOT NULL, " + COL_MAT_KHAU + " TEXT NOT NULL, " + COL_NGAY_TAO + " TEXT DEFAULT CURRENT_TIMESTAMP)";
         db.execSQL(createUserTable);
+
         createMealPlanTable(db);
         createExerciseTable(db);
         createNotificationTable(db);
+        createBMIRecordTable(db);
+        createHealthRecordTable(db);
+        createReminderTable(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 2) {
-            createMealPlanTable(db);
+        if (oldVersion < 9) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_BMI_RECORD);
+            createBMIRecordTable(db);
         }
-        if (oldVersion < 4) {
+        if (oldVersion < 2) createMealPlanTable(db);
+        if (oldVersion < 4 || oldVersion < 6) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISE);
             createExerciseTable(db);
         }
-        if (oldVersion < 5) {
-            createNotificationTable(db);
-        }
-        if (oldVersion < 6) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISE);
-            createExerciseTable(db);
-        }
+        if (oldVersion < 5) createNotificationTable(db);
+        if (oldVersion < 10) createHealthRecordTable(db);
+        if (oldVersion < 11) createReminderTable(db);
     }
 
     private void createMealPlanTable(SQLiteDatabase db) {
@@ -85,6 +103,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_CALO + " INTEGER NOT NULL, "
                 + COL_SO_LUONG + " INTEGER NOT NULL, "
                 + COL_NGAY_AN + " TEXT NOT NULL)";
+        db.execSQL(sql);
+    }
+
+    private void createBMIRecordTable(SQLiteDatabase db) {
+        String createTableBMIRecord = "CREATE TABLE IF NOT EXISTS " + TABLE_BMI_RECORD + " ("
+                + COL_BMI_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_BMI_USER_ID + " INTEGER NOT NULL, "
+                + COL_CHIEU_CAO + " REAL NOT NULL, "
+                + COL_CAN_NANG + " REAL NOT NULL, "
+                + COL_CHI_SO_BMI + " REAL NOT NULL, "
+                + COL_NGAY_DO + " TEXT NOT NULL, "
+                + "FOREIGN KEY(" + COL_BMI_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
+        db.execSQL(createTableBMIRecord);
+    }
+
+    private void createHealthRecordTable(SQLiteDatabase db) {
+        String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_HEALTH_RECORD + " ("
+                + COL_RECORD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_HEALTH_USER_ID + " INTEGER, "
+                + COL_LUONG_NUOC + " INTEGER, "
+                + COL_NGAY_GHI_NHAN + " TEXT, "
+                + "FOREIGN KEY(" + COL_HEALTH_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
         db.execSQL(sql);
     }
 
@@ -107,6 +147,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_NOTIF_CONTENT + " TEXT NOT NULL, "
                 + COL_NOTIF_DATE + " TEXT NOT NULL, "
                 + COL_NOTIF_IS_READ + " INTEGER DEFAULT 0)";
+        db.execSQL(sql);
+    }
+
+    private void createReminderTable(SQLiteDatabase db) {
+        String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_REMINDER + " ("
+                + COL_REMINDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_REMINDER_USER_ID + " INTEGER NOT NULL, "
+                + COL_REMINDER_TYPE + " TEXT NOT NULL, "
+                + COL_REMINDER_TIME + " TEXT NOT NULL, "
+                + COL_REMINDER_STATUS + " INTEGER DEFAULT 0, "
+                + "FOREIGN KEY(" + COL_REMINDER_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
         db.execSQL(sql);
     }
 }

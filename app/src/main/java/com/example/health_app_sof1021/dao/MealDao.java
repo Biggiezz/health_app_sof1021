@@ -44,6 +44,10 @@ public class MealDao {
     }
 
     public boolean themMonAn(String tenMon, String loaiBua, int soLuong, String ngayAn) {
+        return themMonAn(1, tenMon, loaiBua, soLuong, ngayAn);
+    }
+
+    public boolean themMonAn(int userId, String tenMon, String loaiBua, int soLuong, String ngayAn) {
         int calo = getCaloTheoMon(tenMon);
         if (calo <= 0 || soLuong <= 0 || ngayAn.isEmpty()) {
             return false;
@@ -51,7 +55,7 @@ public class MealDao {
 
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COL_MEAL_USER_ID, 1);
+        values.put(DatabaseHelper.COL_MEAL_USER_ID, userId);
         values.put(DatabaseHelper.COL_TEN_MON, tenMon);
         values.put(DatabaseHelper.COL_LOAI_BUA, loaiBua);
         values.put(DatabaseHelper.COL_CALO, calo);
@@ -63,13 +67,17 @@ public class MealDao {
     }
 
     public List<Meal> getDanhSachTheoNgay(String ngayAn) {
+        return getDanhSachTheoNgay(1, ngayAn);
+    }
+
+    public List<Meal> getDanhSachTheoNgay(int userId, String ngayAn) {
         List<Meal> meals = new ArrayList<>();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         Cursor cursor = db.query(
                 DatabaseHelper.TABLE_MEAL_PLAN,
                 null,
-                DatabaseHelper.COL_NGAY_AN + " = ?",
-                new String[]{ngayAn},
+                DatabaseHelper.COL_MEAL_USER_ID + " = ? AND " + DatabaseHelper.COL_NGAY_AN + " = ?",
+                new String[]{String.valueOf(userId), ngayAn},
                 null,
                 null,
                 DatabaseHelper.COL_MEAL_ID + " DESC"
@@ -91,13 +99,18 @@ public class MealDao {
     }
 
     public int getTongCaloTheoNgay(String ngayAn) {
+        return getTongCaloTheoNgay(1, ngayAn);
+    }
+
+    public int getTongCaloTheoNgay(int userId, String ngayAn) {
         int tongCalo = 0;
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery(
                 "SELECT SUM(" + DatabaseHelper.COL_CALO + " * " + DatabaseHelper.COL_SO_LUONG + ") FROM "
                         + DatabaseHelper.TABLE_MEAL_PLAN
-                        + " WHERE " + DatabaseHelper.COL_NGAY_AN + " = ?",
-                new String[]{ngayAn}
+                        + " WHERE " + DatabaseHelper.COL_MEAL_USER_ID + " = ? AND "
+                        + DatabaseHelper.COL_NGAY_AN + " = ?",
+                new String[]{String.valueOf(userId), ngayAn}
         );
 
         if (cursor.moveToFirst()) {

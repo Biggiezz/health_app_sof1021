@@ -72,6 +72,83 @@ public class ExerciseDao {
                 new String[]{String.valueOf(id)}) > 0;
     }
 
+    public boolean markCompletedByNameAndDate(int userId, String name, String date) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COL_EX_STATUS, 1);
+
+        int result = db.update(
+                DatabaseHelper.TABLE_EXERCISE,
+                values,
+                DatabaseHelper.COL_EX_USER_ID + " = ? AND "
+                        + DatabaseHelper.COL_EX_NAME + " = ? AND "
+                        + DatabaseHelper.COL_EX_DATE + " = ?",
+                new String[]{String.valueOf(userId), name, date}
+        );
+        return result > 0;
+    }
+
+    public int getTotalCountByDate(int userId, String date) {
+        return getCountByDateAndStatus(userId, date, -1);
+    }
+
+    public int getCompletedCountByDate(int userId, String date) {
+        return getCountByDateAndStatus(userId, date, 1);
+    }
+
+    public int getTotalCountByUserId(int userId) {
+        return getCountByUserIdAndStatus(userId, -1);
+    }
+
+    public int getCompletedCountByUserId(int userId) {
+        return getCountByUserIdAndStatus(userId, 1);
+    }
+
+    private int getCountByUserIdAndStatus(int userId, int status) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_EXERCISE
+                + " WHERE " + DatabaseHelper.COL_EX_USER_ID + " = ?";
+        String[] args;
+
+        if (status == -1) {
+            args = new String[]{String.valueOf(userId)};
+        } else {
+            sql += " AND " + DatabaseHelper.COL_EX_STATUS + " = ?";
+            args = new String[]{String.valueOf(userId), String.valueOf(status)};
+        }
+
+        Cursor cursor = db.rawQuery(sql, args);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
+    }
+
+    private int getCountByDateAndStatus(int userId, String date, int status) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_EXERCISE
+                + " WHERE " + DatabaseHelper.COL_EX_USER_ID + " = ? AND "
+                + DatabaseHelper.COL_EX_DATE + " = ?";
+        String[] args;
+
+        if (status == -1) {
+            args = new String[]{String.valueOf(userId), date};
+        } else {
+            sql += " AND " + DatabaseHelper.COL_EX_STATUS + " = ?";
+            args = new String[]{String.valueOf(userId), date, String.valueOf(status)};
+        }
+
+        Cursor cursor = db.rawQuery(sql, args);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
+    }
+
     public boolean delete(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         return db.delete(DatabaseHelper.TABLE_EXERCISE, DatabaseHelper.COL_EX_ID + " = ?",
