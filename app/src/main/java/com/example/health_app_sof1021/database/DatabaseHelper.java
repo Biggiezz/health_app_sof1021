@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "HealthApp.db";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 9;
 
     public static final String TABLE_USER = "User";
     public static final String COL_USER_ID = "userId";
@@ -14,6 +14,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_EMAIL = "email";
     public static final String COL_MAT_KHAU = "matKhau";
     public static final String COL_NGAY_TAO = "ngayTao";
+
+    public static final String TABLE_BMI_RECORD = "BmiRecord";
+    public static final String COL_BMI_ID = "bmiId";
+    public static final String COL_BMI_USER_ID = "userId";
+    public static final String COL_CHIEU_CAO = "chieuCao";
+    public static final String COL_CAN_NANG = "canNang";
+    public static final String COL_CHI_SO_BMI = "chiSoBMI";
+    public static final String COL_NGAY_DO = "ngayDo";
 
     public static final String TABLE_MEAL_PLAN = "MealPlan";
     public static final String COL_MEAL_ID = "mealId";
@@ -53,38 +61,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_MAT_KHAU + " TEXT NOT NULL, "
                 + COL_NGAY_TAO + " TEXT DEFAULT CURRENT_TIMESTAMP)";
         db.execSQL(createUserTable);
+        
         createMealPlanTable(db);
         createExerciseTable(db);
         createNotificationTable(db);
         createBMIRecordTable(db);
-
-        String createTableBMIRecord = "CREATE TABLE BMIRecord (" +
-                "BmiID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "userId INTEGER, " +
-                "chieuCao REAL, " +
-                "canNang REAL, " +
-                "chiSoBMI REAL, " +
-                "ngayDo TEXT, " +
-                "FOREIGN KEY(userId) REFERENCES User(UserID))";
-        db.execSQL(createTableBMIRecord);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 2) {
-            createMealPlanTable(db);
+        if (oldVersion < 9) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_BMI_RECORD);
+            createBMIRecordTable(db);
         }
-        if (oldVersion < 4) {
+        // Các logic upgrade cũ
+        if (oldVersion < 2) createMealPlanTable(db);
+        if (oldVersion < 4 || oldVersion < 6) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISE);
             createExerciseTable(db);
         }
-        if (oldVersion < 5) {
-            createNotificationTable(db);
-        }
-        if (oldVersion < 6) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISE);
-            createExerciseTable(db);
-        }
+        if (oldVersion < 5) createNotificationTable(db);
     }
 
     private void createMealPlanTable(SQLiteDatabase db) {
@@ -100,14 +96,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void createBMIRecordTable(SQLiteDatabase db) {
-        String createTableBMIRecord = "CREATE TABLE BMIRecord (" +
-                "BmiID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "userId INTEGER, " +
-                "chieuCao REAL, " +
-                "canNang REAL, " +
-                "chiSoBMI REAL, " +
-                "ngayDo TEXT, " +
-                "FOREIGN KEY(userId) REFERENCES User(UserID))";
+        String createTableBMIRecord = "CREATE TABLE IF NOT EXISTS " + TABLE_BMI_RECORD + " (" +
+                COL_BMI_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_BMI_USER_ID + " INTEGER NOT NULL, " +
+                COL_CHIEU_CAO + " REAL NOT NULL, " +
+                COL_CAN_NANG + " REAL NOT NULL, " +
+                COL_CHI_SO_BMI + " REAL NOT NULL, " +
+                COL_NGAY_DO + " TEXT NOT NULL, " +
+                "FOREIGN KEY(" + COL_BMI_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
         db.execSQL(createTableBMIRecord);
     }
 

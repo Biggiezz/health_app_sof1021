@@ -14,7 +14,7 @@ import com.example.health_app_sof1021.R;
 import com.google.android.material.card.MaterialCardView;
 
 public class MainActivity extends AppCompatActivity {
-    private MaterialCardView btnCardMeals, btnCardExercise, btnCardProfile;
+    private MaterialCardView btnCardBMI, btnCardMeals, btnCardExercise, btnCardProfile;
     private FrameLayout btnCardNotification;
 
     @Override
@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initListener() {
+        btnCardBMI.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, BmiActivity.class)));
         btnCardMeals.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MealActivity.class)));
         btnCardExercise.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ExerciseActivity.class)));
         btnCardProfile.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProfileActivity.class)));
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initUi() {
+        btnCardBMI = findViewById(R.id.btnCardBMI);
         btnCardMeals = findViewById(R.id.btnCardMeals);
         btnCardExercise = findViewById(R.id.btnCardExercise);
         btnCardNotification = findViewById(R.id.btnCardNotification);

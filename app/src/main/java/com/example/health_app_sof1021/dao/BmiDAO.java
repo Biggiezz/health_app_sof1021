@@ -11,41 +11,81 @@ import com.example.health_app_sof1021.model.BmiRecord;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class BmiDAO {
-    private SQLiteDatabase db;
+    private DatabaseHelper dbHelper;
 
     public BmiDAO(Context context) {
-        DatabaseHelper dbHelper = new DatabaseHelper(context);
-        db = dbHelper.getWritableDatabase();
+        dbHelper = new DatabaseHelper(context);
     }
 
     public long insertBMI(BmiRecord record) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("userId", record.getUserId());
-        values.put("chieuCao", record.getChieuCao());
-        values.put("canNang", record.getCanNang());
-        values.put("chiSoBMI", record.getChiSoBMI());
-        values.put("ngayDo", record.getNgayDo());
-        return db.insert("BMIRecord", null, values);
+        values.put(DatabaseHelper.COL_BMI_USER_ID, record.getUserId());
+        values.put(DatabaseHelper.COL_CHIEU_CAO, record.getChieuCao());
+        values.put(DatabaseHelper.COL_CAN_NANG, record.getCanNang());
+        values.put(DatabaseHelper.COL_CHI_SO_BMI, record.getChiSoBMI());
+        values.put(DatabaseHelper.COL_NGAY_DO, record.getNgayDo());
+        return db.insert(DatabaseHelper.TABLE_BMI_RECORD, null, values);
     }
 
-    public List<BmiRecord> getHistory(int userId) {
+    public List<BmiRecord> getAllHistoryByUserId(int userId) {
         List<BmiRecord> list = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT * FROM BMIRecord WHERE userId = ? ORDER BY BmiID DESC", new String[]{String.valueOf(userId)});
-        if (cursor.moveToFirst()) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(DatabaseHelper.TABLE_BMI_RECORD, null,
+                DatabaseHelper.COL_BMI_USER_ID + " = ?",
+                new String[]{String.valueOf(userId)}, null, null,
+                DatabaseHelper.COL_NGAY_DO + " DESC");
+
+        if (cursor != null && cursor.moveToFirst()) {
             do {
                 BmiRecord r = new BmiRecord();
-                r.setBmiId(cursor.getInt(0));
-                r.setUserId(cursor.getInt(1));
-                r.setChieuCao(cursor.getDouble(2));
-                r.setCanNang(cursor.getDouble(3));
-                r.setChiSoBMI(cursor.getDouble(4));
-                r.setNgayDo(cursor.getString(5));
+                r.setBmiId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BMI_ID)));
+                r.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BMI_USER_ID)));
+                r.setChieuCao(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_CHIEU_CAO)));
+                r.setCanNang(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_CAN_NANG)));
+                r.setChiSoBMI(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_CHI_SO_BMI)));
+                r.setNgayDo(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NGAY_DO)));
                 list.add(r);
             } while (cursor.moveToNext());
         }
-        cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        }
         return list;
+    }
+
+    /**
+     * Lấy bản ghi BMI mới nhất của người dùng (chứa chiều cao và cân nặng gần nhất)
+     */
+    public BmiRecord getBMIByUserId(int userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(
+                DatabaseHelper.TABLE_BMI_RECORD,
+                null,
+                DatabaseHelper.COL_BMI_USER_ID + " = ?",
+                new String[]{String.valueOf(userId)},
+                null,
+                null,
+                DatabaseHelper.COL_NGAY_DO + " DESC",
+                "1"
+        );
+
+        BmiRecord bmi = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            bmi = new BmiRecord();
+            bmi.setBmiId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BMI_ID)));
+            bmi.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BMI_USER_ID)));
+            bmi.setChieuCao(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_CHIEU_CAO)));
+            bmi.setCanNang(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_CAN_NANG)));
+            bmi.setChiSoBMI(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_CHI_SO_BMI)));
+            bmi.setNgayDo(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NGAY_DO)));
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        return bmi;
     }
 }

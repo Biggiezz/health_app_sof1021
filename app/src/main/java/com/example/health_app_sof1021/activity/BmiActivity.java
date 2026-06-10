@@ -1,6 +1,7 @@
 package com.example.health_app_sof1021.activity;
 
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.health_app_sof1021.R;
 import com.example.health_app_sof1021.adapter.BmiAdapter;
 import com.example.health_app_sof1021.dao.BmiDAO;
+import com.example.health_app_sof1021.database.DatabaseHelper;
 import com.example.health_app_sof1021.model.BmiRecord;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -32,6 +34,8 @@ public class BmiActivity extends AppCompatActivity {
     int userId;
     BmiDAO bmiDAO;
     BmiAdapter adapter;
+    DatabaseHelper dbHelper;
+    SQLiteDatabase db;
 
 
     @Override
@@ -96,15 +100,16 @@ public class BmiActivity extends AppCompatActivity {
 
     private void prepopulateFields() {
         // Lấy chiều cao, cân nặng hiện tại từ BMIRecord gần nhất để điền sẵn vào input
-        List<BmiRecord> list = bmiDAO.getHistory(userId);
+        List<BmiRecord> list = bmiDAO.getAllHistoryByUserId(userId);
         if (!list.isEmpty()) {
             BmiRecord latest = list.get(0);
             edHeight.setText(String.format(Locale.getDefault(), "%.1f", latest.getChieuCao()));
             edWeight.setText(String.format(Locale.getDefault(), "%.1f", latest.getCanNang()));
         }
     }
+
     private void loadHistory() {
-        List<BmiRecord> list = bmiDAO.getHistory(userId);
+        List<BmiRecord> list = bmiDAO.getAllHistoryByUserId(userId);
         if (!list.isEmpty()) {
             BmiRecord latest = list.get(0);
             double bmi = latest.getChiSoBMI();
