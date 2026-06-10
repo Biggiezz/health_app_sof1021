@@ -1,9 +1,5 @@
 package com.example.health_app_sof1021.activity;
 
-import android.content.ContentValues;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -21,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.health_app_sof1021.R;
 import com.example.health_app_sof1021.dao.WaterDAO;
-import com.example.health_app_sof1021.database.DatabaseHelper;
+import com.example.health_app_sof1021.utils.SessionManager;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.SimpleDateFormat;
@@ -39,7 +35,6 @@ public class WaterActivity extends AppCompatActivity {
     Button btnSaveReminder;
     MaterialToolbar toolbarWater;
     WaterDAO waterDAO;
-    DatabaseHelper dbHelper;
     int userId;
     int targetAmount = 2000;
     int currentAmount = 0;
@@ -54,11 +49,10 @@ public class WaterActivity extends AppCompatActivity {
 
         initUi();
 
-        dbHelper = new DatabaseHelper(this);
         waterDAO = new WaterDAO(this);
 
-        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        userId = prefs.getInt("userId", -1);
+        SessionManager sessionManager = new SessionManager(this);
+        userId = sessionManager.getUserId();
         today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         toolbarWater.setNavigationOnClickListener(v -> finish());
 
@@ -80,57 +74,53 @@ public class WaterActivity extends AppCompatActivity {
         btnCustomAdd.setOnClickListener(v -> {
             String customStr = edCustomWater.getText().toString().trim();
             if (!customStr.isEmpty()) {
-                int ml = Integer.parseInt(customStr);
-                addWater(ml);
-                edCustomWater.setText("");
+                try {
+                    int ml = Integer.parseInt(customStr);
+                    addWater(ml);
+                    edCustomWater.setText("");
+                } catch (NumberFormatException e) {
+                    Toast.makeText(this, "Lượng nước không hợp lệ", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(this, "Vui lòng nhập lượng nước", Toast.LENGTH_SHORT).show();
             }
         });
 
         btnSaveReminder.setOnClickListener(v -> saveReminderSettings());
+        loadTargetAndReminder();
+        updateUI();
     }
 
     private void initUi() {
-        tvCurrent.findViewById(R.id.tvWaterCurrent);
-        tvTarget.findViewById(R.id.tvWaterTarget);
-        pbWater.findViewById(R.id.pbWater);
-        btn100.findViewById(R.id.btnAdd100);
-        btn250.findViewById(R.id.btnAdd250);
-        btn500.findViewById(R.id.btnAdd500);
-        btnCustomAdd.findViewById(R.id.btnCustomAdd);
-        edCustomWater.findViewById(R.id.edCustomWater);
-        swWaterReminder.findViewById(R.id.swWaterReminder);
-        spnWaterInterval.findViewById(R.id.spnWaterInterval);
-        layoutInterval.findViewById(R.id.layoutInterval);
-        btnSaveReminder.findViewById(R.id.btnSaveReminder);
-        toolbarWater.findViewById(R.id.toolbarWater);
+        tvCurrent = findViewById(R.id.tvWaterCurrent);
+        tvTarget = findViewById(R.id.tvWaterTarget);
+        pbWater = findViewById(R.id.pbWater);
+        btn100 = findViewById(R.id.btnAdd100);
+        btn250 = findViewById(R.id.btnAdd250);
+        btn500 = findViewById(R.id.btnAdd500);
+        btnCustomAdd = findViewById(R.id.btnCustomAdd);
+        edCustomWater = findViewById(R.id.edCustomWater);
+        swWaterReminder = findViewById(R.id.swWaterReminder);
+        spnWaterInterval = findViewById(R.id.spnWaterInterval);
+        layoutInterval = findViewById(R.id.layoutInterval);
+        btnSaveReminder = findViewById(R.id.btnSaveReminder);
+        toolbarWater = findViewById(R.id.toolbarWater);
     }
 
     private void loadTargetAndReminder() {
-        // Load target
-        SharedPreferences pref = getSharedPreferences("USER_INFO", MODE_PRIVATE);
-        targetAmount = pref.getInt(userId + "_targetNuoc", 2000);
-
+        WaterDAO.WaterReminderSettings settings = waterDAO.loadTargetAndReminder(userId);
+        targetAmount = settings.getTargetAmount();
         tvTarget.setText("Mục tiêu hôm nay: " + targetAmount + " ml");
         pbWater.setMax(targetAmount);
 
-        // Load reminder
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM Reminder WHERE userId = ? AND loaiNhacNho = ?", new String[]{String.valueOf(userId), "Uống nước"});
-        if (cursor.moveToFirst()) {
-            int status = cursor.getInt(4); // cột trangThai
-            String intervalVal = cursor.getString(3); // cột gioNhac
-            swWaterReminder.setChecked(status == 1);
-            layoutInterval.setVisibility(status == 1 ? View.VISIBLE : View.GONE);
-            for (int i = 0; i < intervals.length; i++) {
-                if (intervals[i].equals(intervalVal)) {
-                    spnWaterInterval.setSelection(i);
-                    break;
-                }
+        swWaterReminder.setChecked(settings.isReminderOn());
+        layoutInterval.setVisibility(settings.isReminderOn() ? View.VISIBLE : View.GONE);
+        for (int i = 0; i < intervals.length; i++) {
+            if (intervals[i].equals(settings.getInterval())) {
+                spnWaterInterval.setSelection(i);
+                break;
             }
         }
-        cursor.close();
     }
 
     private void addWater(int ml) {
@@ -154,27 +144,7 @@ public class WaterActivity extends AppCompatActivity {
         boolean isOn = swWaterReminder.isChecked();
         String interval = spnWaterInterval.getSelectedItem().toString();
 
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        // Kiểm tra xem bản ghi đã tồn tại chưa
-        Cursor cursor = db.rawQuery("SELECT * FROM Reminder WHERE userId = ? AND loaiNhacNho = ?",
-                new String[]{String.valueOf(userId), "Uống nước"});
-        boolean exists = cursor.getCount() > 0;
-        cursor.close();
-
-        ContentValues values = new ContentValues();
-        values.put("userId", userId);
-        values.put("loaiNhacNho", "Uống nước");
-        values.put("gioNhac", interval);
-        values.put("trangThai", isOn ? 1 : 0);
-
-        long res;
-        if (exists) {
-            res = db.update("Reminder", values, "userId = ? AND loaiNhacNho = ?", new String[]{String.valueOf(userId), "Uống nước"});
-        } else {
-            res = db.insert("Reminder", null, values);
-        }
-
-        if (res > 0) {
+        if (waterDAO.saveReminderSettings(userId, isOn, interval)) {
             Toast.makeText(this, "Đã lưu cài đặt nhắc nhở!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Không thể lưu cài đặt!", Toast.LENGTH_SHORT).show();

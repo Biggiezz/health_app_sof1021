@@ -3,6 +3,7 @@ package com.example.health_app_sof1021.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -13,22 +14,34 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.health_app_sof1021.R;
 import com.example.health_app_sof1021.dao.BmiDAO;
+import com.example.health_app_sof1021.dao.ExerciseDao;
+import com.example.health_app_sof1021.dao.MealDao;
 import com.example.health_app_sof1021.dao.UserDAO;
+import com.example.health_app_sof1021.dao.WaterDAO;
 import com.example.health_app_sof1021.model.BmiRecord;
 import com.example.health_app_sof1021.model.User;
 import com.example.health_app_sof1021.utils.SessionManager;
 import com.google.android.material.card.MaterialCardView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    private MaterialCardView btnCardBMI, btnCardMeals, btnCardExercise, btnCardProfile;
+    private static final int DEFAULT_CALORIE_TARGET = 2200;
+
+    private MaterialCardView btnCardBMI, btnCardMeals, btnCardExercise, btnCardProfile, btnCardWater;
     private FrameLayout btnCardNotification;
     private TextView tvHomeName, tvHomeHeightWeight, tvHomeBMIClass, tvHomeBMIValue;
+    private TextView tvHomeWaterProgress, tvHomeCaloProgress, tvHomeWorkoutProgress;
+    private ProgressBar pbHomeWater, pbHomeCalo, pbHomeWorkout;
     
     private SessionManager sessionManager;
     private UserDAO userDAO;
     private BmiDAO bmiDAO;
+    private WaterDAO waterDAO;
+    private MealDao mealDao;
+    private ExerciseDao exerciseDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         userDAO = new UserDAO(this);
         bmiDAO = new BmiDAO(this);
+        waterDAO = new WaterDAO(this);
+        mealDao = new MealDao(this);
+        exerciseDao = new ExerciseDao(this);
 
         initUi();
         initListener();
@@ -62,11 +78,18 @@ public class MainActivity extends AppCompatActivity {
         btnCardExercise = findViewById(R.id.btnCardExercise);
         btnCardNotification = findViewById(R.id.btnCardNotification);
         btnCardProfile = findViewById(R.id.btnCardProfile);
+        btnCardWater = findViewById(R.id.btnCardWater);
 
         tvHomeName = findViewById(R.id.tvHomeName);
         tvHomeHeightWeight = findViewById(R.id.tvHomeHeightWeight);
         tvHomeBMIClass = findViewById(R.id.tvHomeBMIClass);
         tvHomeBMIValue = findViewById(R.id.tvHomeBMIValue);
+        tvHomeWaterProgress = findViewById(R.id.tvHomeWaterProgress);
+        tvHomeCaloProgress = findViewById(R.id.tvHomeCaloProgress);
+        tvHomeWorkoutProgress = findViewById(R.id.tvHomeWorkoutProgress);
+        pbHomeWater = findViewById(R.id.pbHomeWater);
+        pbHomeCalo = findViewById(R.id.pbHomeCalo);
+        pbHomeWorkout = findViewById(R.id.pbHomeWorkout);
     }
 
     private void loadHomeData() {
@@ -100,6 +123,41 @@ public class MainActivity extends AppCompatActivity {
             tvHomeBMIValue.setText("--");
             tvHomeBMIClass.setText("Thể trạng: --");
         }
+
+        loadWaterProgress(userId);
+        loadCalorieProgress(userId);
+        loadWorkoutProgress(userId);
+    }
+
+    private void loadCalorieProgress(int userId) {
+        String today = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        int currentCalorie = mealDao.getTongCaloTheoNgay(userId, today);
+
+        pbHomeCalo.setMax(DEFAULT_CALORIE_TARGET);
+        pbHomeCalo.setProgress(Math.min(currentCalorie, DEFAULT_CALORIE_TARGET));
+        tvHomeCaloProgress.setText(String.format(Locale.getDefault(),
+                "%d / %d kcal", currentCalorie, DEFAULT_CALORIE_TARGET));
+    }
+
+    private void loadWaterProgress(int userId) {
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        int currentWater = waterDAO.getWaterIntake(userId, today);
+        int targetWater = waterDAO.loadTargetAndReminder(userId).getTargetAmount();
+
+        pbHomeWater.setMax(targetWater);
+        pbHomeWater.setProgress(Math.min(currentWater, targetWater));
+        tvHomeWaterProgress.setText(String.format(Locale.getDefault(),
+                "%d / %d ml", currentWater, targetWater));
+    }
+
+    private void loadWorkoutProgress(int userId) {
+        int completedWorkout = exerciseDao.getCompletedCountByUserId(userId);
+        int totalWorkout = exerciseDao.getTotalCountByUserId(userId);
+
+        pbHomeWorkout.setMax(Math.max(totalWorkout, 1));
+        pbHomeWorkout.setProgress(Math.min(completedWorkout, totalWorkout));
+        tvHomeWorkoutProgress.setText(String.format(Locale.getDefault(),
+                "%d / %d bài", completedWorkout, totalWorkout));
     }
 
     private void initListener() {
@@ -108,5 +166,6 @@ public class MainActivity extends AppCompatActivity {
         btnCardExercise.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ExerciseActivity.class)));
         btnCardProfile.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProfileActivity.class)));
         btnCardNotification.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, NotificationActivity.class)));
+        btnCardWater.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, WaterActivity.class)));
     }
 }

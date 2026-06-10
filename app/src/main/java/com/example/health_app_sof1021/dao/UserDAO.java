@@ -128,4 +128,18 @@ public class UserDAO {
         );
         return result > 0;
     }
+
+    public boolean updatePasswordByUserId(int userId, String matKhauMoi) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COL_MAT_KHAU, matKhauMoi);
+
+        int result = db.update(
+                DatabaseHelper.TABLE_USER,
+                values,
+                DatabaseHelper.COL_USER_ID + " = ?",
+                new String[]{String.valueOf(userId)}
+        );
+        return result > 0;
+    }
 }

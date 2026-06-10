@@ -21,9 +21,9 @@ import java.util.Locale;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private ImageView ivSetting, ivBack, ivProfile;
+    private ImageView  ivBack;
     private TextView tvUserName, tvEmail, tvHeightValue, tvWeightValue;
-    private LinearLayout btnHeartRate, btnSteps, btnSleep, btnWater, btnLogout;
+    private LinearLayout btnChangePassword, btnLogout;
     private SessionManager sessionManager;
     private UserDAO userDAO;
     private BmiDAO bmiDAO;
@@ -51,23 +51,19 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void initUi() {
         ivBack = findViewById(R.id.ivBack);
-        ivProfile = findViewById(R.id.ivProfile);
         tvUserName = findViewById(R.id.tvUserName);
         tvEmail = findViewById(R.id.tvEmail);
         tvHeightValue = findViewById(R.id.tvHeightValue);
         tvWeightValue = findViewById(R.id.tvWeightValue);
 
-        btnHeartRate = findViewById(R.id.btnHeartRate);
-        btnSteps = findViewById(R.id.btnSteps);
-        btnSleep = findViewById(R.id.btnSleep);
-        btnWater = findViewById(R.id.btnWater);
+        btnChangePassword = findViewById(R.id.btnChangePassword);
         btnLogout = findViewById(R.id.btnLogout);
     }
 
     private void loadUserInfo() {
         int userId = sessionManager.getUserId();
         User user = userDAO.getUserById(userId);
-        
+
         // Lấy bản ghi BMI mới nhất (chứa chiều cao/cân nặng mới nhất)
         BmiRecord bmi = bmiDAO.getBMIByUserId(userId);
 
@@ -101,6 +97,9 @@ public class ProfileActivity extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
+        });
+        btnChangePassword.setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, ChangePasswordActivity.class));
         });
         ivBack.setOnClickListener(v -> finish());
     }

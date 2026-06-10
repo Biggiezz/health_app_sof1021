@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "HealthApp.db";
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
 
     public static final String TABLE_USER = "User";
     public static final String COL_USER_ID = "userId";
@@ -54,6 +54,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_NOTIF_DATE = "ngayThongBao";
     public static final String COL_NOTIF_IS_READ = "daDoc";
 
+    public static final String TABLE_REMINDER = "Reminder";
+    public static final String COL_REMINDER_ID = "reminderId";
+    public static final String COL_REMINDER_USER_ID = "userId";
+    public static final String COL_REMINDER_TYPE = "loaiNhacNho";
+    public static final String COL_REMINDER_TIME = "gioNhac";
+    public static final String COL_REMINDER_STATUS = "trangThai";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -68,6 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createNotificationTable(db);
         createBMIRecordTable(db);
         createHealthRecordTable(db);
+        createReminderTable(db);
     }
 
     @Override
@@ -83,6 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (oldVersion < 5) createNotificationTable(db);
         if (oldVersion < 10) createHealthRecordTable(db);
+        if (oldVersion < 11) createReminderTable(db);
     }
 
     private void createMealPlanTable(SQLiteDatabase db) {
@@ -138,6 +147,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_NOTIF_CONTENT + " TEXT NOT NULL, "
                 + COL_NOTIF_DATE + " TEXT NOT NULL, "
                 + COL_NOTIF_IS_READ + " INTEGER DEFAULT 0)";
+        db.execSQL(sql);
+    }
+
+    private void createReminderTable(SQLiteDatabase db) {
+        String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_REMINDER + " ("
+                + COL_REMINDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_REMINDER_USER_ID + " INTEGER NOT NULL, "
+                + COL_REMINDER_TYPE + " TEXT NOT NULL, "
+                + COL_REMINDER_TIME + " TEXT NOT NULL, "
+                + COL_REMINDER_STATUS + " INTEGER DEFAULT 0, "
+                + "FOREIGN KEY(" + COL_REMINDER_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
         db.execSQL(sql);
     }
 }

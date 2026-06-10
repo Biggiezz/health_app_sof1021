@@ -21,6 +21,7 @@ import com.example.health_app_sof1021.R;
 import com.example.health_app_sof1021.dao.MealDao;
 import com.example.health_app_sof1021.model.Meal;
 import com.example.health_app_sof1021.utils.DateUtils;
+import com.example.health_app_sof1021.utils.SessionManager;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.SimpleDateFormat;
@@ -38,6 +39,7 @@ public class MealActivity extends AppCompatActivity {
     private MealDao mealDao;
     private ArrayAdapter<Meal> mealPlanAdapter;
     private List<Meal> mealPlans;
+    private int currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,8 @@ public class MealActivity extends AppCompatActivity {
         });
 
         mealDao = new MealDao(this);
+        SessionManager sessionManager = new SessionManager(this);
+        currentUserId = sessionManager.getUserId();
         initUi();
         initSpinner();
         initEvent();
@@ -131,7 +135,7 @@ public class MealActivity extends AppCompatActivity {
         int soLuong = Integer.parseInt(soLuongText);
         String tenMon = spnMonAn.getSelectedItem().toString();
         String loaiBua = spnLoaiBua.getSelectedItem().toString();
-        boolean isSuccess = mealDao.themMonAn(tenMon, loaiBua, soLuong, ngayAn);
+        boolean isSuccess = mealDao.themMonAn(currentUserId, tenMon, loaiBua, soLuong, ngayAn);
 
         if (isSuccess) {
             Toast.makeText(this, "Đã thêm món ăn", Toast.LENGTH_SHORT).show();
@@ -144,9 +148,9 @@ public class MealActivity extends AppCompatActivity {
     private void hienThiDanhSach() {
         String ngayAn = edtNgayAn.getText().toString().trim();
         mealPlans.clear();
-        mealPlans.addAll(mealDao.getDanhSachTheoNgay(ngayAn));
+        mealPlans.addAll(mealDao.getDanhSachTheoNgay(currentUserId, ngayAn));
         mealPlanAdapter.notifyDataSetChanged();
-        tvTongCalo.setText("Tổng calo trong ngày: " + mealDao.getTongCaloTheoNgay(ngayAn));
+        tvTongCalo.setText("Tổng calo trong ngày: " + mealDao.getTongCaloTheoNgay(currentUserId, ngayAn));
     }
 
     private void hienThiTuyChonMonAn(Meal meal) {
