@@ -23,6 +23,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CHI_SO_BMI = "chiSoBMI";
     public static final String COL_NGAY_DO = "ngayDo";
 
+    public static final String TABLE_HEALTH_RECORD = "HealthRecord";
+    public static final String COL_RECORD_ID = "recordId";
+    public static final String COL_HEALTH_USER_ID = "userId";
+    public static final String COL_LUONG_NUOC = "luongNuoc";
+    public static final String COL_NGAY_GHI_NHAN = "ngayGhiNhan";
+
     public static final String TABLE_MEAL_PLAN = "MealPlan";
     public static final String COL_MEAL_ID = "mealId";
     public static final String COL_MEAL_USER_ID = "userId";
@@ -54,18 +60,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createUserTable = "CREATE TABLE " + TABLE_USER + " ("
-                + COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COL_HO_TEN + " TEXT NOT NULL, "
-                + COL_EMAIL + " TEXT UNIQUE NOT NULL, "
-                + COL_MAT_KHAU + " TEXT NOT NULL, "
-                + COL_NGAY_TAO + " TEXT DEFAULT CURRENT_TIMESTAMP)";
+        String createUserTable = "CREATE TABLE " + TABLE_USER + " (" + COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_HO_TEN + " TEXT NOT NULL, " + COL_EMAIL + " TEXT UNIQUE NOT NULL, " + COL_MAT_KHAU + " TEXT NOT NULL, " + COL_NGAY_TAO + " TEXT DEFAULT CURRENT_TIMESTAMP)";
         db.execSQL(createUserTable);
-        
+
         createMealPlanTable(db);
         createExerciseTable(db);
         createNotificationTable(db);
         createBMIRecordTable(db);
+        createHealthRecordTable(db);
     }
 
     @Override
@@ -74,7 +76,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_BMI_RECORD);
             createBMIRecordTable(db);
         }
-        // Các logic upgrade cũ
         if (oldVersion < 2) createMealPlanTable(db);
         if (oldVersion < 4 || oldVersion < 6) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISE);
@@ -96,15 +97,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void createBMIRecordTable(SQLiteDatabase db) {
-        String createTableBMIRecord = "CREATE TABLE IF NOT EXISTS " + TABLE_BMI_RECORD + " (" +
-                COL_BMI_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL_BMI_USER_ID + " INTEGER NOT NULL, " +
-                COL_CHIEU_CAO + " REAL NOT NULL, " +
-                COL_CAN_NANG + " REAL NOT NULL, " +
-                COL_CHI_SO_BMI + " REAL NOT NULL, " +
-                COL_NGAY_DO + " TEXT NOT NULL, " +
-                "FOREIGN KEY(" + COL_BMI_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
+        String createTableBMIRecord = "CREATE TABLE IF NOT EXISTS " + TABLE_BMI_RECORD + " ("
+                + COL_BMI_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_BMI_USER_ID + " INTEGER NOT NULL, "
+                + COL_CHIEU_CAO + " REAL NOT NULL, "
+                + COL_CAN_NANG + " REAL NOT NULL, "
+                + COL_CHI_SO_BMI + " REAL NOT NULL, "
+                + COL_NGAY_DO + " TEXT NOT NULL, "
+                + "FOREIGN KEY(" + COL_BMI_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
         db.execSQL(createTableBMIRecord);
+    }
+
+    private void createHealthRecordTable(SQLiteDatabase db) {
+        String createTableHealthRecord = "CREATE TABLE IF NOT EXISTS " + TABLE_HEALTH_RECORD + " ("
+                + COL_RECORD_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_HEALTH_USER_ID + " INTEGER, "
+                + COL_LUONG_NUOC + " INTEGER, "
+                + COL_NGAY_GHI_NHAN + " TEXT, "
+                + "FOREIGN KEY(" + COL_BMI_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))";
+        db.execSQL(createTableHealthRecord);
     }
 
     private void createExerciseTable(SQLiteDatabase db) {
