@@ -93,12 +93,14 @@ public class StatisticsActivity extends AppCompatActivity {
         setupWaterChart();
     }
 
-    // Hàm tìm kiếm dữ liệu theo ngày
     private void searchHealthData(String displayDate) {
         boolean hasData = false;
 
-        String queryDate = convertDateFormat(displayDate);
-        StatisticsDAO.BmiStatistics bmi = statisticsDAO.getBmiStatisticsByDate(userId, queryDate);
+        String queryDate = convertDateFormat(displayDate); // Định dạng: yyyy-MM-dd (cho Nước)
+        String dashDate = displayDate.replace('/', '-');    // Định dạng: dd-MM-yyyy (cho Bữa ăn và Tập luyện)
+
+        // 1. BMI: Dùng displayDate (định dạng dd/MM/yyyy)
+        StatisticsDAO.BmiStatistics bmi = statisticsDAO.getBmiStatisticsByDate(userId, displayDate);
         if (bmi != null) {
             hasData = true;
             tvResultBMI.setText(String.format(Locale.getDefault(),
@@ -106,50 +108,60 @@ public class StatisticsActivity extends AppCompatActivity {
                     bmi.getBmi(), bmi.getWeight(), bmi.getHeight()));
             tvResultBMI.setVisibility(View.VISIBLE);
         } else {
-            tvResultBMI.setVisibility(View.GONE);
+            // Fallback: Lấy chỉ số đo BMI gần đây nhất từ lịch sử đo
+            List<BmiRecord> history = bmiDAO.getAllHistoryByUserId(userId);
+            if (history != null && !history.isEmpty()) {
+                BmiRecord latest = history.get(0);
+
+                double latestBmi = latest.getChiSoBMI();
+                double latestWeight = latest.getCanNang();
+                double latestHeight = latest.getChieuCao();
+
+                tvResultBMI.setText(String.format(Locale.getDefault(),
+                        "BMI: %.2f | Cân nặng: %.1f kg | Chiều cao: %.1f cm (Gần nhất)",
+                        latestBmi, latestWeight, latestHeight));
+                tvResultBMI.setVisibility(View.VISIBLE);
+            } else {
+                tvResultBMI.setVisibility(View.GONE);
+            }
         }
 
+        // 2. Nước uống: Dùng queryDate (định dạng yyyy-MM-dd)
         int waterSum = statisticsDAO.getWaterAmountByDate(userId, queryDate);
         if (waterSum > 0) {
             hasData = true;
-            tvResultWater.setText("Lượng nước đã uống: " + waterSum + " ml");
-            tvResultWater.setVisibility(View.VISIBLE);
-        } else {
-            tvResultWater.setVisibility(View.GONE);
         }
+        tvResultWater.setText("Lượng nước uống: " + waterSum + " ml");
+        tvResultWater.setVisibility(View.VISIBLE);
 
-        int caloSum = statisticsDAO.getCaloriesByDate(userId, queryDate);
+        // 3. Calo bữa ăn: Dùng dashDate (định dạng dd-MM-yyyy)
+        int caloSum = statisticsDAO.getCaloriesByDate(userId, dashDate);
         if (caloSum > 0) {
             hasData = true;
-            tvResultMeals.setText("Tổng lượng Calo bữa ăn: " + caloSum + " kcal");
-            tvResultMeals.setVisibility(View.VISIBLE);
-        } else {
-            tvResultMeals.setVisibility(View.GONE);
         }
+        tvResultMeals.setText("Tổng lượng Calo bữa ăn: " + caloSum + " kcal");
+        tvResultMeals.setVisibility(View.VISIBLE);
 
-        StatisticsDAO.ExerciseStatistics exercise = statisticsDAO.getExerciseStatisticsByDate(userId, queryDate);
+        // 4. Bài tập tập luyện: Dùng dashDate (định dạng dd-MM-yyyy)
+        StatisticsDAO.ExerciseStatistics exercise = statisticsDAO.getExerciseStatisticsByDate(userId, dashDate);
         if (exercise.getTotal() > 0) {
             hasData = true;
             tvResultExercises.setText("Bài tập đã hoàn thành: "
                     + exercise.getCompleted() + " / " + exercise.getTotal() + " bài");
-            tvResultExercises.setVisibility(View.VISIBLE);
         } else {
-            tvResultExercises.setVisibility(View.GONE);
+            tvResultExercises.setText("Bài tập đã hoàn thành: 0 / 0 bài");
         }
+        tvResultExercises.setVisibility(View.VISIBLE);
 
+        // Hiển thị tiêu đề kết quả
         if (hasData) {
             tvResultTitle.setText("Dữ liệu ghi nhận ngày " + displayDate + ":");
-            layoutResult.setVisibility(View.VISIBLE);
         } else {
-            tvResultTitle.setText("Ngày " + displayDate + ": Không có dữ liệu ghi nhận nào!");
-            tvResultBMI.setVisibility(View.GONE);
-            tvResultWater.setVisibility(View.GONE);
-            tvResultMeals.setVisibility(View.GONE);
-            tvResultExercises.setVisibility(View.GONE);
-            layoutResult.setVisibility(View.VISIBLE);
+            tvResultTitle.setText("Ngày " + displayDate + ": Không có hoạt động mới ghi nhận!");
         }
-
+        layoutResult.setVisibility(View.VISIBLE);
     }
+
     private void setupBmiChart(){
         List<BmiRecord> history = bmiDAO.getAllHistoryByUserId(userId);
         ArrayList<Entry> entries = new ArrayList<>();
