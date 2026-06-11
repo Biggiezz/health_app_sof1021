@@ -47,12 +47,11 @@ public class MealDao {
         return themMonAn(1, tenMon, loaiBua, soLuong, ngayAn);
     }
 
-    public boolean themMonAn(int userId, String tenMon, String loaiBua, int soLuong, String ngayAn) {
-        int calo = getCaloTheoMon(tenMon);
-        if (calo <= 0 || soLuong <= 0 || ngayAn.isEmpty()) {
-            return false;
-        }
-
+    /**
+     * Thêm thông tin bữa ăn vào cơ sở dữ liệu.
+     * Cập nhật: Thêm loaiBua và soLuong để tránh vi phạm ràng buộc NOT NULL trong database.
+     */
+    public boolean addMealIntake(int userId, String tenMon, String loaiBua, int calo, int soLuong, String ngayAn) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COL_MEAL_USER_ID, userId);
@@ -61,9 +60,16 @@ public class MealDao {
         values.put(DatabaseHelper.COL_CALO, calo);
         values.put(DatabaseHelper.COL_SO_LUONG, soLuong);
         values.put(DatabaseHelper.COL_NGAY_AN, ngayAn);
-
         long result = db.insert(DatabaseHelper.TABLE_MEAL_PLAN, null, values);
         return result != -1;
+    }
+
+    public boolean themMonAn(int userId, String tenMon, String loaiBua, int soLuong, String ngayAn) {
+        int calo = getCaloTheoMon(tenMon);
+        if (calo <= 0 || soLuong <= 0 || ngayAn.isEmpty()) {
+            return false;
+        }
+        return addMealIntake(userId, tenMon, loaiBua, calo, soLuong, ngayAn);
     }
 
     public List<Meal> getDanhSachTheoNgay(String ngayAn) {
