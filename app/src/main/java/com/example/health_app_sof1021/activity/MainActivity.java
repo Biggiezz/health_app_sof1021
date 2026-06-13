@@ -28,8 +28,6 @@ import java.util.Date;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int DEFAULT_CALORIE_TARGET = 2200;
-
     private MaterialCardView btnCardBMI, btnCardMeals, btnCardExercise, btnCardProfile, btnCardWater, btnCardStats;
     private FrameLayout btnCardNotification;
     private TextView tvHomeName, tvHomeHeightWeight, tvHomeBMIClass, tvHomeBMIValue;
@@ -133,17 +131,18 @@ public class MainActivity extends AppCompatActivity {
     private void loadCalorieProgress(int userId) {
         String today = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         int currentCalorie = mealDao.getTongCaloTheoNgay(userId, today);
+        int targetCalorie = Math.max(sessionManager.getGoalCalories(), 1);
 
-        pbHomeCalo.setMax(DEFAULT_CALORIE_TARGET);
-        pbHomeCalo.setProgress(Math.min(currentCalorie, DEFAULT_CALORIE_TARGET));
+        pbHomeCalo.setMax(targetCalorie);
+        pbHomeCalo.setProgress(Math.min(currentCalorie, targetCalorie));
         tvHomeCaloProgress.setText(String.format(Locale.getDefault(),
-                "%d / %d kcal", currentCalorie, DEFAULT_CALORIE_TARGET));
+                "%d / %d kcal", currentCalorie, targetCalorie));
     }
 
     private void loadWaterProgress(int userId) {
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         int currentWater = waterDAO.getWaterIntake(userId, today);
-        int targetWater = waterDAO.loadTargetAndReminder(userId).getTargetAmount();
+        int targetWater = Math.max(sessionManager.getGoalWater(), 1);
 
         pbHomeWater.setMax(targetWater);
         pbHomeWater.setProgress(Math.min(currentWater, targetWater));

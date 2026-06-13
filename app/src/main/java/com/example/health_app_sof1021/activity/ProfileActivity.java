@@ -140,6 +140,11 @@ public class ProfileActivity extends AppCompatActivity {
             int calories = Integer.parseInt(calStr);
             int water = Integer.parseInt(waterStr);
 
+            if (calories <= 0 || water <= 0) {
+                Toast.makeText(this, "Mục tiêu phải lớn hơn 0", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             sessionManager.setGoalCalories(calories);
             sessionManager.setGoalWater(water);
 
