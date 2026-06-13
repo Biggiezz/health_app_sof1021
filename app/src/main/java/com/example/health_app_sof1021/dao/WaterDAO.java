@@ -2,16 +2,14 @@ package com.example.health_app_sof1021.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.health_app_sof1021.database.DatabaseHelper;
+import com.example.health_app_sof1021.utils.SessionManager;
 
 public class WaterDAO {
     private static final String WATER_REMINDER_TYPE = "Uống nước";
-    private static final String PREF_USER_INFO = "USER_INFO";
-    private static final int DEFAULT_TARGET_AMOUNT = 2000;
 
     private final Context context;
     private final SQLiteDatabase db;
@@ -98,8 +96,8 @@ public class WaterDAO {
     }
 
     private int getTargetAmount(int userId) {
-        SharedPreferences pref = context.getSharedPreferences(PREF_USER_INFO, Context.MODE_PRIVATE);
-        return pref.getInt(userId + "_targetNuoc", DEFAULT_TARGET_AMOUNT);
+        SessionManager sessionManager = new SessionManager(context);
+        return sessionManager.getGoalWater();
     }
 
     public static class WaterReminderSettings {
