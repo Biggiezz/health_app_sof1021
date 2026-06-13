@@ -2,6 +2,7 @@ package com.example.health_app_sof1021.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,6 +19,7 @@ import com.example.health_app_sof1021.dao.UserDAO;
 import com.example.health_app_sof1021.model.BmiRecord;
 import com.example.health_app_sof1021.model.User;
 import com.example.health_app_sof1021.utils.SessionManager;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Locale;
 
@@ -26,6 +28,9 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView ivBack, ivProfile;
     private TextView tvUserName, tvEmail, tvHeightValue, tvWeightValue;
     private LinearLayout btnChangePassword, btnLogout;
+    private TextInputEditText tietGoalCalories, tietGoalWater;
+    private Button btnUpdateGoals;
+    
     private SessionManager sessionManager;
     private UserDAO userDAO;
     private BmiDAO bmiDAO;
@@ -36,11 +41,12 @@ public class ProfileActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile);
 
-        initUi();
         sessionManager = new SessionManager(this);
         userDAO = new UserDAO(this);
         bmiDAO = new BmiDAO(this);
 
+        initUi();
+        loadGoals();
         setupClickListeners();
     }
 
@@ -59,8 +65,18 @@ public class ProfileActivity extends AppCompatActivity {
         tvHeightValue = findViewById(R.id.tvHeightValue);
         tvWeightValue = findViewById(R.id.tvWeightValue);
 
+        tietGoalCalories = findViewById(R.id.tietGoalCalories);
+        tietGoalWater = findViewById(R.id.tietGoalWater);
+        btnUpdateGoals = findViewById(R.id.btnUpdateGoals);
+
         btnChangePassword = findViewById(R.id.btnChangePassword);
         btnLogout = findViewById(R.id.btnLogout);
+    }
+
+    /// Load lượng calories và nước mục tiêu mỗi ngày
+    private void loadGoals() {
+        tietGoalCalories.setText(String.valueOf(sessionManager.getGoalCalories()));
+        tietGoalWater.setText(String.valueOf(sessionManager.getGoalWater()));
     }
 
     private void loadUserInfo() {
@@ -101,9 +117,36 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+        
         btnChangePassword.setOnClickListener(v -> startActivity(new Intent(ProfileActivity.this, ChangePasswordActivity.class)));
+        
         ivBack.setOnClickListener(v -> finish());
+        
         ivProfile.setOnClickListener(v -> showEditProfileDialog());
+
+        btnUpdateGoals.setOnClickListener(v -> updateGoals());
+    }
+
+    private void updateGoals() {
+        String calStr = tietGoalCalories.getText().toString().trim();
+        String waterStr = tietGoalWater.getText().toString().trim();
+
+        if (calStr.isEmpty() || waterStr.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ mục tiêu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            int calories = Integer.parseInt(calStr);
+            int water = Integer.parseInt(waterStr);
+
+            sessionManager.setGoalCalories(calories);
+            sessionManager.setGoalWater(water);
+
+            Toast.makeText(this, "Cập nhật mục tiêu thành công!", Toast.LENGTH_SHORT).show();
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Vui lòng nhập số hợp lệ", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showEditProfileDialog() {

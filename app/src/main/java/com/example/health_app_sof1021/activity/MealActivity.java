@@ -40,6 +40,8 @@ public class MealActivity extends AppCompatActivity {
     private ArrayAdapter<Meal> mealPlanAdapter;
     private List<Meal> mealPlans;
     private int currentUserId;
+    int targetAmount = 2200;
+    private int currentAmount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,11 +137,17 @@ public class MealActivity extends AppCompatActivity {
         int soLuong = Integer.parseInt(soLuongText);
         String tenMon = spnMonAn.getSelectedItem().toString();
         String loaiBua = spnLoaiBua.getSelectedItem().toString();
+
+        int oldAmount = currentAmount;
         boolean isSuccess = mealDao.themMonAn(currentUserId, tenMon, loaiBua, soLuong, ngayAn);
 
         if (isSuccess) {
             Toast.makeText(this, "Đã thêm món ăn", Toast.LENGTH_SHORT).show();
             hienThiDanhSach();
+
+            if (oldAmount < targetAmount && currentAmount >= targetAmount) {
+                Toast.makeText(this, "Chúc mừng! Bạn đã đạt mục tiêu ăn uống hôm nay!", Toast.LENGTH_LONG).show();
+            }
         } else {
             Toast.makeText(this, "Thêm món ăn thất bại", Toast.LENGTH_SHORT).show();
         }
@@ -150,7 +158,9 @@ public class MealActivity extends AppCompatActivity {
         mealPlans.clear();
         mealPlans.addAll(mealDao.getDanhSachTheoNgay(currentUserId, ngayAn));
         mealPlanAdapter.notifyDataSetChanged();
-        tvTongCalo.setText("Tổng calo trong ngày: " + mealDao.getTongCaloTheoNgay(currentUserId, ngayAn));
+        
+        currentAmount = mealDao.getTongCaloTheoNgay(currentUserId, ngayAn);
+        tvTongCalo.setText("Tổng calo trong ngày: " + currentAmount);
     }
 
     private void hienThiTuyChonMonAn(Meal meal) {
