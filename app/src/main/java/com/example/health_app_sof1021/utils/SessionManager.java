@@ -7,6 +7,8 @@ public class SessionManager {
     private static final String PREF_NAME = "HealthAppSession";
     private static final String KEY_USER_ID = "userId";
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
+    private static final String KEY_GOAL_CALORIES = "goalCalories";
+    private static final String KEY_GOAL_WATER = "goalWater";
 
     private final SharedPreferences pref;
     private final SharedPreferences.Editor editor;
@@ -30,6 +32,24 @@ public class SessionManager {
 
     public int getUserId() {
         return pref.getInt(KEY_USER_ID, -1);
+    }
+
+    public void setGoalCalories(int calories) {
+        editor.putInt(KEY_GOAL_CALORIES, calories);
+        editor.apply();
+    }
+
+    public int getGoalCalories() {
+        return pref.getInt(KEY_GOAL_CALORIES, 2200); // Default 2200
+    }
+
+    public void setGoalWater(int ml) {
+        editor.putInt(KEY_GOAL_WATER, ml);
+        editor.apply();
+    }
+
+    public int getGoalWater() {
+        return pref.getInt(KEY_GOAL_WATER, 2000); // Default 2000ml
     }
 
     public void logoutUser() {
